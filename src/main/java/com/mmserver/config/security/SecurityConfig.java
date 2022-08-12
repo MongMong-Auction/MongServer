@@ -52,6 +52,11 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .anyRequest().permitAll();
 
+        // OAuth2 로그인 설정
+        http.oauth2Login()
+                // OAuth2를 통해 Authentication 생성에 필요한 OAuthUser 반환하는 클래스 지정
+                .userInfoEndpoint().userService(oAuthService);
+
         return http.build();
     }
 }
