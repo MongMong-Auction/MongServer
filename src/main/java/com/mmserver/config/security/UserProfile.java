@@ -1,5 +1,6 @@
 package com.mmserver.config.security;
 
+import com.mmserver.config.security.oauth.OAuthUserProfile;
 import com.mmserver.domain.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -44,10 +45,10 @@ public class UserProfile implements OAuth2User {
     /**
      * 소셜 로그인 사용을 위한 생성자
      *
-     * @param user : 사용자 정보
+     * @param userProfile : OAuth 기관으로부터 얻은 사용자 정보
      */
-    public UserProfile(User user, Map<String, Object> attributes) {
-        this.user       = user;
+    public UserProfile(OAuthUserProfile userProfile, Map<String, Object> attributes) {
+        this.user       = new User().oauthInfoUpdate(userProfile);
         this.attributes = attributes;
     }
 

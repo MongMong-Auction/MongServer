@@ -7,13 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,7 +20,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Entity
-@DynamicInsert
 public class User {
 
     /**
@@ -107,6 +102,16 @@ public class User {
     private LocalDateTime modifiedDate;
 
     /**
+     * insert 되기전 실행
+     * */
+    @PrePersist
+    public void prePersist() {
+        // role 값이 없을 경우
+        // default => USER
+        role = role == null ? RoleType.USER : role;
+    }
+
+    /**
      * 로컬 회원가입 시, 객체 생성을 위한 생성
      *
      * @param email         : 사용자 아이디
@@ -133,18 +138,24 @@ public class User {
      *
      * @param userProfile : OAuth2 제공 기관으로 부터 제공받은 데이터로 가공한 객체
      */
-    public void mainInfoUpdate(OAuthUserProfile userProfile) {
+    public User oauthInfoUpdate(OAuthUserProfile userProfile) {
         email    = userProfile.getEmail();
         oauth    = userProfile.getOauth();
         userName = userProfile.getUserName();
 
-        if(lastLogin == null){
-            // 최초 로그인의 경우 10point 추가
-            point = 100;
-        }else if(!lastLogin.isEqual(LocalDate.now())){
-            // 해당 날짜에 처음 로그인의 경우 10point 추가
-            point += 10;
-        }
+        return this;
+    }
+
+    /**
+     * 로그인 성공 시,
+     * Authentication에 저장된 User 데이터 세팅
+     *
+     * @param user : 사용자 정보
+     */
+    public void mainInfoUpdate(User user){
+        email    = user.getEmail();
+        oauth    = user.getOauth();
+        userName = user.getUserName();
     }
 
     /**
@@ -167,9 +178,15 @@ public class User {
      * 마지막 로그인 날짜 업데이트
      */
     public void lastLoginUpdate(){
-        // 최초 로그인이거나 오늘 로그인한 적이 없는 경우
-        // 마지막 로그인 날짜 업데이트
-        if(lastLogin == null || !lastLogin.isEqual(LocalDate.now())){
+        if(lastLogin == null){
+            // 최초 로그인의 경우
+            // 10point 추가
+            point = 100;
+            lastLogin = LocalDate.now();
+        }else if(!lastLogin.isEqual(LocalDate.now())){
+            // 해당 날짜에 처음 로그인의 경우
+            // 10point 추가
+            point += 10;
             lastLogin = LocalDate.now();
         }
     }
