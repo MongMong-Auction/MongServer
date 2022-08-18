@@ -1,6 +1,8 @@
 package com.mmserver.config.security;
 
-import com.mmserver.config.security.oauth.OAuthService;
+import com.mmserver.config.security.oauth.OAuthFailureHandler;
+import com.mmserver.config.security.oauth.OAuthSuccessHandler;
+import com.mmserver.config.security.oauth.OAuthProvider;
 import com.mmserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,7 @@ public class SecurityConfig {
     /**
      *  OAuth2User 객체를 만들기 위한 Service
      */
-    private final OAuthService oAuthService;
+    private final OAuthProvider oAuthProvider;
 
     /**
      * PasswordEncoder 구현체 설정
@@ -64,11 +66,12 @@ public class SecurityConfig {
         // OAuth2 로그인 설정
         http.oauth2Login()
                 // OAuth2를 통해 Authentication 생성에 필요한 OAuthUser 반환하는 클래스 지정
-                .userInfoEndpoint().userService(oAuthService)
+                .userInfoEndpoint().userService(oAuthProvider)
                 .and()
-
-                // 로그인 성공 시, 후처리 클래스
-                .successHandler(new LoginSuccessHandler(userRepository));
+                // 인증 성공 시, 호출하는 핸들러
+                .successHandler(new OAuthSuccessHandler(userRepository))
+                // 인증 실패 시, 호출하는 핸들러
+                .failureHandler(new OAuthFailureHandler());
 
         return http.build();
     }

@@ -44,8 +44,8 @@ public class OAuthUserProfile {
      */
     @Builder(access = AccessLevel.PRIVATE)
     private OAuthUserProfile(String email, String oauth, String userName) {
-        this.email = email;
-        this.oauth = oauth;
+        this.email    = email;
+        this.oauth    = oauth;
         this.userName = userName;
     }
 
@@ -53,9 +53,9 @@ public class OAuthUserProfile {
      * OAuthUserProfile 객체 반환 정적 팩터리
      * OAuth 제공 기관에 따라 데이터 세팅
      *
-     * @param  oauth                 : OAuth 제공 기관
-     * @param  attributes            : 사용자 정보를 담고있는 컬렉션
-     * @return OAuthUserProfile      : 가공된 사용자 정보
+     * @param  oauth            : OAuth 제공 기관
+     * @param  attributes       : 사용자 정보를 담고있는 컬렉션
+     * @return OAuthUserProfile : 가공된 사용자 정보
      */
     public static OAuthUserProfile of(String oauth, Map<String, Object> attributes){
         switch(oauth){
