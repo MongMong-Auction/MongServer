@@ -55,21 +55,6 @@ public class User {
     private long point;
 
     /**
-     * 도로명
-     */
-    private String roadAddress;
-
-    /**
-     *  우편번호
-     */
-    private String zoneNo;
-
-    /**
-     * 상세 주소
-     */
-    private String addressDetail;
-
-    /**
      * 테마 설정 값
      */
     private int theme;
@@ -80,7 +65,7 @@ public class User {
     private int failCnt;
 
     /**
-     * 잠금 여부
+     * 계정 잠금 여부
      */
     private String lockYn;
 
@@ -108,7 +93,9 @@ public class User {
     public void prePersist() {
         // role 값이 없을 경우
         // default => USER
-        role = role == null ? RoleType.USER : role;
+        role   = role == null ? RoleType.USER : role;
+        // 계정 잠금 여부 N
+        lockYn = "N";
     }
 
     /**
@@ -117,19 +104,13 @@ public class User {
      * @param email         : 사용자 아이디
      * @param password      : 비밀번호
      * @param userName      : 사용자 이름
-     * @param roadAddress   : 도로명
-     * @param zoneNo        : 우편번호
-     * @param addressDetail : 상세주소
      */
     @Builder
-    public User(String email, String oauth, String password, String userName, String roadAddress, String zoneNo, String addressDetail) {
-        this.email         = email;
-        this.oauth         = oauth;
-        this.password      = password;
-        this.userName      = userName;
-        this.roadAddress   = roadAddress;
-        this.zoneNo        = zoneNo;
-        this.addressDetail = addressDetail;
+    public User(String email, String oauth, String password, String userName) {
+        this.email    = email;
+        this.oauth    = oauth;
+        this.password = password;
+        this.userName = userName;
     }
 
     /**
@@ -147,7 +128,7 @@ public class User {
     }
 
     /**
-     * 로그인 성공 시,
+     * 인증 성공 시,
      * Authentication에 저장된 User 데이터 세팅
      *
      * @param user : 사용자 정보
@@ -159,28 +140,12 @@ public class User {
     }
 
     /**
-     * 소셜 로그인 추가 정보 저장
-     *
-     * @param  roadAddress   : 도로명
-     * @param  zoneNo        : 우편번호
-     * @param  addressDetail : 상세 주소
-     * @return User          : User Entity 객체
-     */
-    public User subInfoUpdate(String roadAddress, String zoneNo, String addressDetail){
-        this.roadAddress   = roadAddress;
-        this.zoneNo        = zoneNo;
-        this.addressDetail = addressDetail;
-
-        return this;
-    }
-
-    /**
      * 마지막 로그인 날짜 업데이트
      */
     public void lastLoginUpdate(){
         if(lastLogin == null){
             // 최초 로그인의 경우
-            // 10point 추가
+            // 100point로 초기화
             point = 100;
             lastLogin = LocalDate.now();
         }else if(!lastLogin.isEqual(LocalDate.now())){
