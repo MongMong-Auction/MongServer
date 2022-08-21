@@ -1,6 +1,6 @@
 package com.mmserver.domain.model;
 
-import com.mmserver.config.security.oauth.OAuthUserProfile;
+import com.mmserver.config.security.oauth.OAuthUserInfo;
 import com.mmserver.domain.EnumType.RoleType;
 import lombok.Builder;
 import lombok.Getter;
@@ -119,7 +119,7 @@ public class User {
      *
      * @param userProfile : OAuth2 제공 기관으로 부터 제공받은 데이터로 가공한 객체
      */
-    public User oauthInfoUpdate(OAuthUserProfile userProfile) {
+    public User oauthInfoUpdate(OAuthUserInfo userProfile) {
         email    = userProfile.getEmail();
         oauth    = userProfile.getOauth();
         userName = userProfile.getUserName();

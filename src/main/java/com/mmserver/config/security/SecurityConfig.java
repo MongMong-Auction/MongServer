@@ -1,19 +1,27 @@
 package com.mmserver.config.security;
 
-import com.mmserver.config.security.oauth.OAuthFailureHandler;
-import com.mmserver.config.security.oauth.OAuthSuccessHandler;
-import com.mmserver.config.security.oauth.OAuthProvider;
+import com.mmserver.config.security.jwt.JwtAccessDeniedHandler;
+import com.mmserver.config.security.jwt.JwtAuthenticationEntryPoint;
+import com.mmserver.config.security.jwt.JwtAuthenticationFilter;
+import com.mmserver.config.security.jwt.JwtProvider;
+import com.mmserver.config.security.oauth.OAuth2AuthorizationRequestRepository;
+import com.mmserver.config.security.oauth.OAuth2FailureHandler;
+import com.mmserver.config.security.oauth.OAuth2Provider;
+import com.mmserver.config.security.oauth.OAuth2SuccessHandler;
+import com.mmserver.repository.RedisRepository;
 import com.mmserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Security 환경 세팅
@@ -30,9 +38,19 @@ public class SecurityConfig {
     private final UserRepository userRepository;
 
     /**
+     * Refresh Token을 관리 Repository
+     */
+    private final RedisRepository redisRepository;
+
+    /**
      *  OAuth2User 객체를 만들기 위한 Service
      */
-    private final OAuthProvider oAuthProvider;
+    private final OAuth2Provider oAuthProvider;
+
+    /**
+     * JWT 관리 Component
+     */
+    private final JwtProvider jwtProvider;
 
     /**
      * PasswordEncoder 구현체 설정
@@ -53,25 +71,42 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // 기본 로그인 창 사용 안함
                 .httpBasic().disable()
-                // CSRF 설정 Disable
+                // Restfull API 방식 사용으로 CSRF 설정 Disable
                 .csrf().disable()
-                // Security는 세션을 사용하지만, REST API기 때문에 세션 설정 Stateless로 설정 => JWT 사용
+                // Restfull API 방식 사용으로 formLogin 설정 Disable
+                .formLogin().disable()
+                // Security는 세션을 사용하지만, Restfull API 방식 사용으로 세션 설정 Stateless로 설정
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // URL 별 권한 설정
         http.authorizeRequests()
-                .anyRequest().permitAll();
+                .antMatchers(HttpMethod.POST, "/signup", "/reissue").permitAll()
+                .anyRequest().hasRole("USER");
+
+        // JWT 설정
+        // UsernamePasswordAuthenticationFilter 필터 전에 JwtAuthenticationFiler가 실행되도록 설정
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                // 예외 처리 핸들링 설정
+                .exceptionHandling()
+                    // 인증예외 처리
+                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                    // 인가예외 처리
+                    .accessDeniedHandler(new JwtAccessDeniedHandler());
 
         // OAuth2 로그인 설정
         http.oauth2Login()
+                // OAuth2AuthorizationRequest를 저장하기위해 필요한 레포지토리 설정
+                .authorizationEndpoint().authorizationRequestRepository(new OAuth2AuthorizationRequestRepository())
+                .and()
                 // OAuth2를 통해 Authentication 생성에 필요한 OAuthUser 반환하는 클래스 지정
                 .userInfoEndpoint().userService(oAuthProvider)
                 .and()
                 // 인증 성공 시, 호출하는 핸들러
-                .successHandler(new OAuthSuccessHandler(userRepository))
+                .successHandler(new OAuth2SuccessHandler(userRepository, redisRepository, jwtProvider))
                 // 인증 실패 시, 호출하는 핸들러
-                .failureHandler(new OAuthFailureHandler());
+                .failureHandler(new OAuth2FailureHandler());
 
         return http.build();
     }

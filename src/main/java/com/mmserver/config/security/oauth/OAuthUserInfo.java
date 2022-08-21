@@ -12,7 +12,7 @@ import java.util.Map;
  */
 @Getter
 @ToString
-public class OAuthUserProfile {
+public class OAuthUserInfo {
 
     /**
      * OAuth 사용자 정보
@@ -43,7 +43,7 @@ public class OAuthUserProfile {
      * @param userName : 사용자 이름
      */
     @Builder(access = AccessLevel.PRIVATE)
-    private OAuthUserProfile(String email, String oauth, String userName) {
+    private OAuthUserInfo(String email, String oauth, String userName) {
         this.email    = email;
         this.oauth    = oauth;
         this.userName = userName;
@@ -57,7 +57,7 @@ public class OAuthUserProfile {
      * @param  attributes       : 사용자 정보를 담고있는 컬렉션
      * @return OAuthUserProfile : 가공된 사용자 정보
      */
-    public static OAuthUserProfile of(String oauth, Map<String, Object> attributes){
+    public static OAuthUserInfo of(String oauth, Map<String, Object> attributes){
         switch(oauth){
             case "google":
                 return ofGoogle(oauth, attributes);
@@ -76,8 +76,8 @@ public class OAuthUserProfile {
      * @param  attributes       : 사용자 정보를 담고있는 컬렉션
      * @return OAuthUserProfile : 가공된 사용자 정보
      */
-    private static OAuthUserProfile ofGoogle(String oauth, Map<String, Object> attributes) {
-        return OAuthUserProfile.builder()
+    private static OAuthUserInfo ofGoogle(String oauth, Map<String, Object> attributes) {
+        return OAuthUserInfo.builder()
                 .oauth(oauth)
                 .email((String) attributes.get("email"))
                 .userName((String) attributes.get("name"))
@@ -93,11 +93,11 @@ public class OAuthUserProfile {
      * @return OAuthUserProfile : 가공된 사용자 정보
      */
     @SuppressWarnings("unchecked")
-    private static OAuthUserProfile ofKakao(String oauth, Map<String, Object> attributes) {
+    private static OAuthUserInfo ofKakao(String oauth, Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
-        return OAuthUserProfile.builder()
+        return OAuthUserInfo.builder()
                 .oauth(oauth)
                 .email((String) kakaoAccount.get("email"))
                 .userName((String) kakaoProfile.get("nickname"))

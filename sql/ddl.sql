@@ -16,14 +16,15 @@ create table user(
     primary key (email)
 ) comment '사용자 관리 테이블' DEFAULT CHARSET=utf8mb4;
 
-drop table if exists auth_token;
-create table auth_token(
-    email			varchar(50)		comment '사용자 아이디',
-    refresh_token	varchar(100)	comment '인증 토큰',
+drop table if exists token;
+create table token(
+    `key` 			    varchar(50)		comment '사용자 아이디',
+    token	            varchar(100)	comment '인증 토큰',
+    token_expire_time   datetime        comment '만료 시간',
 
-    primary key (email, refresh_token),
+    primary key (`key`),
 
-    foreign key (email) references user (email) on delete cascade
+    foreign key (`key`) references user (email) on delete cascade
 ) comment '토큰 관리 테이블' DEFAULT CHARSET=utf8mb4;
 
 drop table if exists item;
@@ -46,7 +47,7 @@ drop table if exists item_img;
 create table item_img(
     item_id		bigint			comment '경매 식별 값',
     sort_no		bigint			comment '이미지 순서',
-    img			varchar(1000),
+    img			mediumblob,
 
     primary key (item_id, sort_no),
 

@@ -1,6 +1,6 @@
 package com.mmserver.config.security.oauth;
 
-import com.mmserver.config.security.UserProfile;
+import com.mmserver.config.security.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class OAuthProvider implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     /**
      * UserInfo Endpoint에서 최종 사용자의 사용자 정보를 가져옴
@@ -48,7 +48,7 @@ public class OAuthProvider implements OAuth2UserService<OAuth2UserRequest, OAuth
         String oauth = userRequest.getClientRegistration().getRegistrationId();
 
         // OAuth 서비스의 유저 정보
-        OAuthUserProfile userProfile = OAuthUserProfile.of(oauth, attributes);
+        OAuthUserInfo userProfile = OAuthUserInfo.of(oauth, attributes);
         // Kakao 로그인의 경우 email 값을 필수로 받을 수 없음
         // OAuth2 인증은 성공하였지만 email 정보 제공 미동의 경우
         // AccessToken을 통해 인증 정보 삭제 및 에러 메시지 출력
@@ -64,7 +64,7 @@ public class OAuthProvider implements OAuth2UserService<OAuth2UserRequest, OAuth
             }
         }
 
-        return new UserProfile(userProfile, attributes);
+        return new UserInfo(userProfile, attributes);
     }
 
     /**

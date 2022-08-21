@@ -12,13 +12,13 @@ import java.io.IOException;
  *  OAuth2 인증 실패 시, 후 처리를 위한 클래스
  *  {@link AuthenticationFailureHandler}을 구현
  */
-public class OAuthFailureHandler implements AuthenticationFailureHandler {
+public class OAuth2FailureHandler implements AuthenticationFailureHandler {
 
     /**
      * OAuth 인증 실패 시
      * HttpStatus 400 + 에러 메시지 응답
      *
-     * @param request   : 로그인 시, 요청
+     * @param request   : 로그인 시, 요청 객체
      * @param response  : 응답 객체
      * @param exception : 인증요청 거부하기 위해 던져진 예외
      * @throws IOException : I/O 시, 오류가 발생한 경우
