@@ -82,6 +82,7 @@ public class SecurityConfig {
 
         // URL 별 권한 설정
         http.authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/signup", "/reissue").permitAll()
                 .anyRequest().hasRole("USER");
 

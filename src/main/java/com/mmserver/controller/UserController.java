@@ -1,20 +1,16 @@
 package com.mmserver.controller;
 
-import com.mmserver.domain.LoginDTO;
-import com.mmserver.domain.UserInfoDTO;
+import com.mmserver.domain.mapper.UserInfoMapping;
 import com.mmserver.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 사용자 관리 Controller
  */
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
 
     /**
@@ -23,14 +19,13 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * 로그인
+     * 사용자 정보 조회
      *
-     * @param  loginDTO : 로그인 정보
-     * @param  response : 응답 객체
-     * @return
+     * @param  email           : 사용자 이메일
+     * @return UserInfoMapping : 사용자 정보 Mapper
      */
-    @GetMapping("/login")
-    public UserInfoDTO login(@ModelAttribute LoginDTO loginDTO, HttpServletResponse response){
-        return userService.login(loginDTO, response);
+    @GetMapping("/{email}")
+    public UserInfoMapping findUserByEmail(@PathVariable String email) {
+        return userService.findUserByEmail(email);
     }
 }

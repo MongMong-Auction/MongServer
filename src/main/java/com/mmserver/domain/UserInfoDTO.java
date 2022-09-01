@@ -9,7 +9,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * 민감한 정보를 제외한 사용자 정보
+ * 사용자 정보
  */
 @Setter
 @Getter

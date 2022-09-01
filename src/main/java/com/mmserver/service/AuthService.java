@@ -2,9 +2,12 @@ package com.mmserver.service;
 
 import com.mmserver.config.security.UserInfo;
 import com.mmserver.config.security.jwt.JwtProvider;
+import com.mmserver.domain.LoginDTO;
+import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
 import com.mmserver.exception.NotFoundEmailException;
+import com.mmserver.exception.NotFoundPasswordException;
 import com.mmserver.repository.RedisRepository;
 import com.mmserver.repository.UserRepository;
 import com.mmserver.utils.JwtUtils;
@@ -100,5 +103,42 @@ public class AuthService {
         }
 
         return false;
+    }
+
+    /**
+     * 로그인
+     *
+     * @param  loginDTO    : 로그인 정보
+     * @param  response    : 응답 객체
+     * @return UserInfoDTO : 로그인 사용자 정보
+     */
+    public UserInfoDTO login(LoginDTO loginDTO, HttpServletResponse response) {
+        // 로그인 아이디 통해 사용자 조회
+        User user = userRepository.findById(loginDTO.getEmail())
+                .orElseThrow(() -> {
+                    // 조회된 사용자 없는 경우 예외 발생
+                    throw new NotFoundEmailException();
+                });
+
+        // 비밀번호 확인
+        if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())){
+            // 비밀번호 미일치 예외
+            throw new NotFoundPasswordException();
+        }
+
+        // 로그인 사용자 정보 인스턴스 생성
+        UserInfo userInfo = new UserInfo(user);
+
+        // Token 생성
+        Token accessToken  = jwtProvider.createAccessToken(userInfo);
+        Token refreshToken = jwtProvider.createRefreshToken(userInfo);
+
+        // Http Header에 Access Token세팅
+        jwtProvider.setHeaderAccessToken(response, accessToken.getToken());
+
+        // Refresh Token Redis에 저장
+        redisRepository.save(refreshToken);
+
+        return new UserInfoDTO().toUserInfo(user);
     }
 }

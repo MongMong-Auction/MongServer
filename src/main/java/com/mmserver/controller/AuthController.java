@@ -25,6 +25,18 @@ public class AuthController {
     private final AuthService authService;
 
     /**
+     * 로그인
+     *
+     * @param  loginDTO    : 로그인 정보
+     * @param  response    : 응답 객체
+     * @return UserInfoDTO : 로그인 사용자 정보
+     */
+    @GetMapping("/login")
+    public UserInfoDTO login(@ModelAttribute LoginDTO loginDTO, HttpServletResponse response){
+        return authService.login(loginDTO, response);
+    }
+
+    /**
      * Access Token 재발급
      *
      * @param  request  : 요청 객체
