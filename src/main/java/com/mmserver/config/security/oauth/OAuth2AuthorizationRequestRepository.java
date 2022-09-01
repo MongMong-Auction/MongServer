@@ -78,22 +78,4 @@ public class OAuth2AuthorizationRequestRepository implements AuthorizationReques
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
         return this.loadAuthorizationRequest(request);
     }
-
-    /**
-     * 요청 객체에 포함된 OAuth2AuthorizationRequest 제거 및 반환
-     *
-     * @param  request                    : 요청 객체
-     * @param  response                   : 응답 객체
-     * @return OAuth2AuthorizationRequest : 요청 객체에서 제거된 OAuth2AuthorizationRequest
-     *                                      (사용할 수 없는 경우 null 반환)
-     */
-    @Override
-    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request, HttpServletResponse response) {
-        OAuth2AuthorizationRequest oAuth2AuthorizationRequest = this.loadAuthorizationRequest(request);
-
-        CookieUtils.deleteCookie(request, response, REQUEST_COOKIE_KEY);
-        CookieUtils.deleteCookie(request, response, COOKIE_KEY);
-
-        return oAuth2AuthorizationRequest;
-    }
 }

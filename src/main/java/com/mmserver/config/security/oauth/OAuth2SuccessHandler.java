@@ -2,7 +2,6 @@ package com.mmserver.config.security.oauth;
 
 import com.mmserver.config.security.UserInfo;
 import com.mmserver.config.security.jwt.JwtProvider;
-import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
 import com.mmserver.repository.RedisRepository;
@@ -114,8 +113,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     throw new RuntimeException("Redirect Uri가 존재하지 않습니다.");
                 });
 
+        log.info("OAuth2 Login Redirect URI : {}", redirectUri);
+
         return UriComponentsBuilder.fromUriString(redirectUri)
-                .queryParam("user", new UserInfoDTO().toUserInfo(user))
+                .queryParam("email", user.getEmail())
                 .build().toUriString();
     }
 }
