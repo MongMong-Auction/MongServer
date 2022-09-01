@@ -22,6 +22,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 /**
  * Security 환경 세팅
@@ -74,6 +79,9 @@ public class SecurityConfig {
                 // 기본 로그인 창 사용 안함
                 .httpBasic().disable()
                 // Restfull API 방식 사용으로 CSRF 설정 Disable
+                // Cors 설정
+                .cors().configurationSource(corsConfigurationSource())
+                .and()
                 .csrf().disable()
                 // Restfull API 방식 사용으로 formLogin 설정 Disable
                 .formLogin().disable()
@@ -110,5 +118,30 @@ public class SecurityConfig {
                 .failureHandler(new OAuth2FailureHandler());
 
         return http.build();
+    }
+
+    /**
+     * Cors 설정
+     *
+     * @return CorsConfigurationSource : CorsConfiguataionSource 구현체 사용
+     *                                   {@link UrlBasedCorsConfigurationSource}
+     *                                   URL 경로 패턴을 통해 CorsConfiguraion을 선택
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+        // Cors 허용 설정
+        corsConfiguration.setAllowedOrigins(Arrays.asList("localhost:3000", "https://black-grass-0bd498c00.1.azurestaticapps.net"));
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+
+        // 모든 url에 대해 적용
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+
+        return urlBasedCorsConfigurationSource;
     }
 }
