@@ -1,11 +1,10 @@
 package com.mmserver.domain.model;
 
-import com.mmserver.config.security.oauth.OAuthUserInfo;
+import com.mmserver.config.security.oauth.OAuth2UserInfo;
 import com.mmserver.domain.EnumType.RoleType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,7 +17,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @NoArgsConstructor
-@ToString
 @Entity
 public class User {
 
@@ -119,7 +117,7 @@ public class User {
      *
      * @param userProfile : OAuth2 제공 기관으로 부터 제공받은 데이터로 가공한 객체
      */
-    public User oauthInfoUpdate(OAuthUserInfo userProfile) {
+    public User oauthInfoUpdate(OAuth2UserInfo userProfile) {
         email    = userProfile.getEmail();
         oauth    = userProfile.getOauth();
         userName = userProfile.getUserName();
@@ -154,5 +152,22 @@ public class User {
             point += 10;
             lastLogin = LocalDate.now();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "email='" + email + '\'' +
+                ", oauth='" + oauth + '\'' +
+                ", userName='" + userName + '\'' +
+                ", role=" + role +
+                ", point=" + point +
+                ", theme=" + theme +
+                ", failCnt=" + failCnt +
+                ", lockYn='" + lockYn + '\'' +
+                ", lastLogin=" + lastLogin +
+                ", createDate=" + createDate +
+                ", modifiedDate=" + modifiedDate +
+                '}';
     }
 }

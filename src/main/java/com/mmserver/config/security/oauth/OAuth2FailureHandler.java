@@ -1,5 +1,6 @@
 package com.mmserver.config.security.oauth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -12,6 +13,7 @@ import java.io.IOException;
  *  OAuth2 인증 실패 시, 후 처리를 위한 클래스
  *  {@link AuthenticationFailureHandler}을 구현
  */
+@Slf4j
 public class OAuth2FailureHandler implements AuthenticationFailureHandler {
 
     /**
@@ -25,6 +27,9 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
      */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
-        response.sendError(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        log.error("Oauth2 인증실패");
+        log.error("  Error Message => {}", exception.getMessage());
+
+        response.sendError(HttpStatus.BAD_REQUEST.value(), "인증에 실패하였습니다.");
     }
 }

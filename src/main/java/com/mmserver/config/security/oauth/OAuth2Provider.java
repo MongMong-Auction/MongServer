@@ -35,6 +35,7 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
      */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("OAuth2 Load User");
 
         // OAuth2UserService 구현체 DefaultOAuth2UserService 사용
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
@@ -43,16 +44,20 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
         // 사용자 정보 추출
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        log.info("  User Attributes => {}", attributes);
 
         // OAuth 서비스 이름
         String oauth = userRequest.getClientRegistration().getRegistrationId();
+        log.info("  OAuth2          => {}", oauth);
 
         // OAuth 서비스의 유저 정보
-        OAuthUserInfo userProfile = OAuthUserInfo.of(oauth, attributes);
+        OAuth2UserInfo userInfo = OAuth2UserInfo.of(oauth, attributes);
+        log.info("  userInfo        => {}", userInfo);
+
         // Kakao 로그인의 경우 email 값을 필수로 받을 수 없음
         // OAuth2 인증은 성공하였지만 email 정보 제공 미동의 경우
         // AccessToken을 통해 인증 정보 삭제 및 에러 메시지 출력
-        if(userProfile.getEmail() == null){
+        if(userInfo.getEmail() == null){
             // 인증정보 삭제 여부
             if(kakaoLogout(userRequest.getAccessToken().getTokenValue())){
                 throw new OAuth2AuthenticationException(new OAuth2Error("400"), "제공 항목 미동의 시, 계속 진행할 수 없습니다.");
@@ -64,7 +69,7 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
             }
         }
 
-        return new UserInfo(userProfile, attributes);
+        return new UserInfo(userInfo, attributes);
     }
 
     /**
@@ -75,6 +80,9 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
      * @return boolean     : 통신 결과
      */
     private boolean kakaoLogout(String accessToken) {
+        log.info("Kakao Logout");
+        log.info("  Kakao Access Token => {}", accessToken);
+
         int result = 0;
 
         String host = "https://kapi.kakao.com/v1/user/unlink";

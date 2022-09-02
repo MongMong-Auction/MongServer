@@ -1,6 +1,6 @@
 package com.mmserver.config.security;
 
-import com.mmserver.config.security.oauth.OAuthUserInfo;
+import com.mmserver.config.security.oauth.OAuth2UserInfo;
 import com.mmserver.domain.model.User;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -60,7 +60,7 @@ public class UserInfo implements UserDetails, OAuth2User {
      *
      * @param userProfile : OAuth 기관으로부터 얻은 사용자 정보
      */
-    public UserInfo(OAuthUserInfo userProfile, Map<String, Object> attributes) {
+    public UserInfo(OAuth2UserInfo userProfile, Map<String, Object> attributes) {
         this.user       = new User().oauthInfoUpdate(userProfile);
         this.attributes = attributes;
     }

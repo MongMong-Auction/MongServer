@@ -4,20 +4,17 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 /**
  * 사용자 정보 가공을 위한 객체
  */
+@Slf4j
 @Getter
 @ToString
-public class OAuthUserInfo {
-
-    /**
-     * OAuth 사용자 정보
-     */
-    Map<String, Object> attributes;
+public class OAuth2UserInfo {
 
     /**
      * 사용자 이메일(Primary Key)
@@ -43,7 +40,7 @@ public class OAuthUserInfo {
      * @param userName : 사용자 이름
      */
     @Builder(access = AccessLevel.PRIVATE)
-    private OAuthUserInfo(String email, String oauth, String userName) {
+    private OAuth2UserInfo(String email, String oauth, String userName) {
         this.email    = email;
         this.oauth    = oauth;
         this.userName = userName;
@@ -57,7 +54,8 @@ public class OAuthUserInfo {
      * @param  attributes       : 사용자 정보를 담고있는 컬렉션
      * @return OAuthUserProfile : 가공된 사용자 정보
      */
-    public static OAuthUserInfo of(String oauth, Map<String, Object> attributes){
+    public static OAuth2UserInfo of(String oauth, Map<String, Object> attributes){
+        log.info("Create {} OAuth2UserInfo Instance", oauth);
         switch(oauth){
             case "google":
                 return ofGoogle(oauth, attributes);
@@ -76,8 +74,8 @@ public class OAuthUserInfo {
      * @param  attributes       : 사용자 정보를 담고있는 컬렉션
      * @return OAuthUserProfile : 가공된 사용자 정보
      */
-    private static OAuthUserInfo ofGoogle(String oauth, Map<String, Object> attributes) {
-        return OAuthUserInfo.builder()
+    private static OAuth2UserInfo ofGoogle(String oauth, Map<String, Object> attributes) {
+        return OAuth2UserInfo.builder()
                 .oauth(oauth)
                 .email((String) attributes.get("email"))
                 .userName((String) attributes.get("name"))
@@ -93,11 +91,11 @@ public class OAuthUserInfo {
      * @return OAuthUserProfile : 가공된 사용자 정보
      */
     @SuppressWarnings("unchecked")
-    private static OAuthUserInfo ofKakao(String oauth, Map<String, Object> attributes) {
+    private static OAuth2UserInfo ofKakao(String oauth, Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
-        return OAuthUserInfo.builder()
+        return OAuth2UserInfo.builder()
                 .oauth(oauth)
                 .email((String) kakaoAccount.get("email"))
                 .userName((String) kakaoProfile.get("nickname"))

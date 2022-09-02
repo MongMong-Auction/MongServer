@@ -32,7 +32,7 @@ public class UserAuthentication extends AbstractAuthenticationToken {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
-        super.setAuthenticated(true); // must use super, as we override
+        super.setAuthenticated(true);
     }
 
     /**

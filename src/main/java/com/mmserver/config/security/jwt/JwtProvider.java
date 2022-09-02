@@ -84,7 +84,7 @@ public class JwtProvider {
      * @return Token       : 토큰 정보
      */
     public Token createAccessToken(UserInfo userProfile) {
-        log.info("Create Access Token");
+        log.info("Access Token 생성");
         return createToken(userProfile, accessTokenExpireTime);
     }
 
@@ -95,7 +95,7 @@ public class JwtProvider {
      * @return Token    : 토큰 정보
      */
     public Token createRefreshToken(UserInfo userInfo) {
-        log.info("Create Refresh Token");
+        log.info("Refresh Token 생성");
         return createToken(userInfo, refreshTokenExpireTime);
     }
 
@@ -144,8 +144,10 @@ public class JwtProvider {
      * @param token : JWT
      */
     public Authentication getAuthentication(String token) {
+        log.info("Get Authentication");
         // 사용자 이메일 조회
         String email = getUserEmail(token);
+        log.info("  email => {}", email);
 
         // Authentication에 저장하기 위한 객체
         UserInfo userInfo = (UserInfo) userService.loadUserByUsername(email);
@@ -198,15 +200,17 @@ public class JwtProvider {
      * @return boolean : 유효성 여부(true => 유효한 JWT)
      */
     public boolean validateToken(String token) {
+        log.info("JWT Validation");
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            log.info("  Success");
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.error("JWT Validation ==> 잘못된 JWT 서명입니다.");
+            log.error("  잘못된 JWT 서명입니다.");
         } catch (UnsupportedJwtException e) {
-            log.error("JWT Validation ==> 지원되지 않는 JWT 토큰입니다.");
+            log.error("  지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            log.error("JWT Validation ==> JWT 토큰이 잘못되었습니다.");
+            log.error("  JWT 토큰이 잘못되었습니다.");
         }
 
         return false;
@@ -219,6 +223,8 @@ public class JwtProvider {
      * @param accessToken : 토큰 값
      */
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
+        log.info("Set Access Token in Header");
+        log.info("  {} : {}", jwtHeader, jwtPrefix + " " + accessToken);
         response.setHeader(jwtHeader, jwtPrefix + " " + accessToken);
     }
 }

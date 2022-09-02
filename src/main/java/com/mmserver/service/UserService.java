@@ -26,7 +26,7 @@ public class UserService implements UserDetailsService {
     /**
      * 사용자 이메일을 통해 UserDetails 인스턴스 반환
      *
-     * @param  username : 사용자 식별 값
+     * @param  username    : 사용자 식별 값
      * @return UserDetails : Authentication에 저장될 객체
      * @throws NotFoundEmailException : 이메일을 통해 조회된 사용자가 없는 경우
      */

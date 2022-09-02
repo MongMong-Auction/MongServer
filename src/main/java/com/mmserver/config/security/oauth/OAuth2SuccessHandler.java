@@ -56,6 +56,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
      */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        log.info("OAuth2 인증 성공");
 
         // 리다이렉트 객체 생성
         DefaultRedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
@@ -64,12 +65,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         UserInfo principal = (UserInfo) authentication.getPrincipal();
         // OAuth2User 객체에서 사용자 정보 추출
         User userInfo = principal.getUser();
+        log.info("  userInfo                  => {}", userInfo);
 
         // DB에 저장된 정보가 있는지 확인
         // 있다면 조회된 정보로 세팅
         // 없다면 Authentication에 저장된 User 객체로 세팅
         User user = userRepository.findById(userInfo.getEmail())
                 .orElse(userInfo);
+        log.info("  findUser                  => {}", user);
 
         // 사용자 정보 업데이트
         user.mainInfoUpdate(user);
@@ -113,7 +116,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     throw new RuntimeException("Redirect Uri가 존재하지 않습니다.");
                 });
 
-        log.info("OAuth2 Login Redirect URI : {}", redirectUri);
+        log.info("  OAuth2 Login Redirect URI => {}", redirectUri);
 
         return UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("email", user.getEmail())

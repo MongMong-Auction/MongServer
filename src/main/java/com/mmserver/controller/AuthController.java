@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * 인증관리 Controller
@@ -44,7 +45,7 @@ public class AuthController {
      * @return boolean  : 재발급 성공여부
      */
     @PostMapping("/reissue")
-    public boolean reissue(HttpServletRequest request, HttpServletResponse response) {
+    public boolean reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
         return authService.reissue(request, response);
     }
 }
