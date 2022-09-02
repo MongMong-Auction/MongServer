@@ -1,10 +1,6 @@
 package com.mmserver.domain;
 
-import com.mmserver.domain.model.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -37,18 +33,11 @@ public class UserInfoDTO implements Serializable {
      */
     private int theme;
 
-    /**
-     * User 객체 UserInfoDTO 객체로 변환
-     *
-     * @param  user        : 전체 사용자 정보
-     * @return UserInfoDTO : 세팅된 객체
-     */
-    public UserInfoDTO toUserInfo(User user) {
-        this.email    = user.getEmail();
-        this.userName = user.getUserName();
-        this.point    = user.getPoint();
-        this.theme    = user.getTheme();
-
-        return this;
+    @Builder
+    public UserInfoDTO(String email, String userName, long point, int theme) {
+        this.email    = email;
+        this.userName = userName;
+        this.point    = point;
+        this.theme    = theme;
     }
 }

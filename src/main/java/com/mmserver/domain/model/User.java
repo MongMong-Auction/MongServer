@@ -2,6 +2,7 @@ package com.mmserver.domain.model;
 
 import com.mmserver.config.security.oauth.OAuth2UserInfo;
 import com.mmserver.domain.EnumType.RoleType;
+import com.mmserver.domain.UserInfoDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -104,9 +105,8 @@ public class User {
      * @param userName      : 사용자 이름
      */
     @Builder
-    public User(String email, String oauth, String password, String userName) {
+    public User(String email, String password, String userName) {
         this.email    = email;
-        this.oauth    = oauth;
         this.password = password;
         this.userName = userName;
     }
@@ -115,12 +115,12 @@ public class User {
      * 소셜 로그인
      * User DB에 저장하기위한 인스턴스 반환
      *
-     * @param userProfile : OAuth2 제공 기관으로 부터 제공받은 데이터로 가공한 객체
+     * @param userInfo : OAuth2 제공 기관으로 부터 제공받은 데이터로 가공한 객체
      */
-    public User oauthInfoUpdate(OAuth2UserInfo userProfile) {
-        email    = userProfile.getEmail();
-        oauth    = userProfile.getOauth();
-        userName = userProfile.getUserName();
+    public User oauthInfoUpdate(OAuth2UserInfo userInfo) {
+        email    = userInfo.getEmail();
+        oauth    = userInfo.getOauth();
+        userName = userInfo.getUserName();
 
         return this;
     }
@@ -154,8 +154,37 @@ public class User {
         }
     }
 
+    /**
+     * 비밀번호 실패 횟수 증가
+     */
+    public void addFailCnt() {
+        failCnt++;
+    }
+
+    /**
+     * 비밀번호 실패 횟수 초기화
+     */
+    public void initFailCnt() {
+        failCnt = 0;
+    }
+
+    /**
+     * User 객체 UserInfoDTO 객체로 변환
+     *
+     * @return UserInfoDTO : 세팅된 객체
+     */
+    public UserInfoDTO toUserInfo() {
+        return UserInfoDTO.builder()
+                .email(this.getEmail())
+                .userName(this.getUserName())
+                .point(this.getPoint())
+                .theme(this.getTheme())
+                .build();
+    }
+
     @Override
     public String toString() {
+        // 비밀번호 제외
         return "User{" +
                 "email='" + email + '\'' +
                 ", oauth='" + oauth + '\'' +

@@ -29,7 +29,7 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
      * Authentication 생성을 위한 OAuth2User 객체를 반환
      *
      * @param  userRequest : 사용자 요청
-     * @return UserProfile : 사용자 정보
+     * @return OAuth2User  : 사용자 정보
      *                       (OAuth2User 구현체)
      * @throws OAuth2AuthenticationException : UserInfo Endpoint에서 사용자 특성을 가져오는 동안 오류가 발생한 경우
      */

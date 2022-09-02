@@ -80,12 +80,12 @@ public class JwtProvider {
     /**
      * Access Token 생성
      *
-     * @param  userProfile : Security Authentication에 저장된 정보
-     * @return Token       : 토큰 정보
+     * @param  userInfo : Security Authentication에 저장된 정보
+     * @return Token    : 토큰 정보
      */
-    public Token createAccessToken(UserInfo userProfile) {
+    public Token createAccessToken(UserInfo userInfo) {
         log.info("Access Token 생성");
-        return createToken(userProfile, accessTokenExpireTime);
+        return createToken(userInfo, accessTokenExpireTime);
     }
 
     /**

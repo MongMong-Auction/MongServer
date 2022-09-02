@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("  접근 Path     => {}", path);
 
             // Access Token 재발급하는 경우 토큰 체크 안함
-            if(!path.startsWith("/reissue")) {
+            if(!path.startsWith("/reissue") && !path.startsWith("/check")) {
                 String accessToken = jwtProvider.resolveToken(request);
                 log.info("  Access Token => {}", accessToken);
 

@@ -3,6 +3,7 @@ package com.mmserver.service;
 import com.mmserver.config.security.UserInfo;
 import com.mmserver.config.security.jwt.JwtProvider;
 import com.mmserver.domain.LoginDTO;
+import com.mmserver.domain.SignupDTO;
 import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
@@ -97,18 +98,8 @@ public class AuthService {
                             });
                     log.info("  Refresh Token Find User    => {}", user);
 
-                    // 로그인 사용자 정보 인스턴스 생성
-                    UserInfo userInfo = new UserInfo(user);
-
-                    // Token 생성
-                    Token newAccessToken = jwtProvider.createAccessToken(userInfo);
-                    Token nweRefreshToken = jwtProvider.createRefreshToken(userInfo);
-
-                    // Http Header에 Access Token세팅
-                    jwtProvider.setHeaderAccessToken(response, newAccessToken.getToken());
-
-                    // Refresh Token Redis에 저장
-                    redisRepository.save(nweRefreshToken);
+                    // 인증정보 세팅
+                    registerAuthorizatione(user, response);
 
                     return true;
                 }
@@ -125,6 +116,36 @@ public class AuthService {
     }
 
     /**
+     * 회원가입
+     * 사용자 정보 저장 시, JWT 값 세팅
+     *
+     * @param  signInfo    : 회원가입 정보
+     * @param  response    : 응답 객체
+     * @return UserInfoDTO : 로그인 사용자 정보
+     */
+    public UserInfoDTO signup(SignupDTO signInfo, HttpServletResponse response) {
+        // 저장 객체 생성
+        User user = User.builder()
+                .email(signInfo.getEmail())
+                .userName(signInfo.getUserName())
+                .password(passwordEncoder.encode(signInfo.getPassword()))
+                .build();
+
+        log.info("  Signup User Info => {}", user);
+
+        // 마지막 로그인 날짜 변경
+        user.lastLoginUpdate();
+
+        // 사용자 정보 저장
+        user = userRepository.save(user);
+
+        // 인증정보 세팅
+        registerAuthorizatione(user, response);
+
+        return user.toUserInfo();
+    }
+
+    /**
      * 로그인
      *
      * @param  loginDTO    : 로그인 정보
@@ -135,7 +156,6 @@ public class AuthService {
         // 로그인 아이디 통해 사용자 조회
         User user = userRepository.findById(loginDTO.getEmail())
                 .orElseThrow(() -> {
-                    log.error("  조회되는 사용자 없음");
                     // 조회된 사용자 없는 경우 예외 발생
                     throw new NotFoundEmailException();
                 });
@@ -144,11 +164,32 @@ public class AuthService {
 
         // 비밀번호 확인
         if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())){
-            log.error("  비밀번호 미일치");
+            // 비밀번호 실패 횟수 증가
+            user.addFailCnt();
             // 비밀번호 미일치 예외
             throw new NotFoundPasswordException();
         }
 
+        // 마지막 로그인 날짜 변경
+        user.lastLoginUpdate();
+        // 비밀번호 실패 횟수 초기화
+        user.initFailCnt();
+
+        // 인증정보 세팅
+        registerAuthorizatione(user, response);
+
+        return user.toUserInfo();
+    }
+
+    /**
+     * 인증정보 세팅
+     *      Access Token  -> Response Header에 세팅
+     *      Refresh Token -> Redis에 저장
+     *
+     * @param user     : 사용자 정보
+     * @param response : 응답 객체
+     */
+    private void registerAuthorizatione(User user, HttpServletResponse response) {
         // 로그인 사용자 정보 인스턴스 생성
         UserInfo userInfo = new UserInfo(user);
 
@@ -161,7 +202,5 @@ public class AuthService {
 
         // Refresh Token Redis에 저장
         redisRepository.save(refreshToken);
-
-        return new UserInfoDTO().toUserInfo(user);
     }
 }

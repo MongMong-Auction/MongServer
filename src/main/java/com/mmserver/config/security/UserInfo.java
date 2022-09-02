@@ -58,10 +58,10 @@ public class UserInfo implements UserDetails, OAuth2User {
     /**
      * 소셜 로그인 사용을 위한 생성자
      *
-     * @param userProfile : OAuth 기관으로부터 얻은 사용자 정보
+     * @param userInfo : OAuth 기관으로부터 얻은 사용자 정보
      */
-    public UserInfo(OAuth2UserInfo userProfile, Map<String, Object> attributes) {
-        this.user       = new User().oauthInfoUpdate(userProfile);
+    public UserInfo(OAuth2UserInfo userInfo, Map<String, Object> attributes) {
+        this.user       = new User().oauthInfoUpdate(userInfo);
         this.attributes = attributes;
     }
 
