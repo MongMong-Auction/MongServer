@@ -49,6 +49,28 @@ public class AuthController {
     }
 
     /**
+     * 사용자 이메일 중복확인
+     *
+     * @param  email   : 사용자 이메일
+     * @return boolean : 중복 여부(true => 중복)
+     */
+    @GetMapping("/check/email")
+    public boolean checkedEmail(@RequestParam String email) {
+        return authService.isCheckedEmail(email);
+    }
+
+    /**
+     * 사용자 이름 중복확인
+     *
+     * @param  userName : 사용자 이름
+     * @return boolean  : 중복 여부(true => 중복)
+     */
+    @GetMapping("/check/userName")
+    public boolean checkedUserName(@RequestParam String userName) {
+        return authService.isCheckedUserName(userName);
+    }
+
+    /**
      * 로그인
      *
      * @param  loginDTO    : 로그인 정보

@@ -7,6 +7,8 @@ import com.mmserver.domain.SignupDTO;
 import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
+import com.mmserver.exception.DuplicationEmailExceiption;
+import com.mmserver.exception.DuplicationUserNameExceiption;
 import com.mmserver.exception.NotFoundEmailException;
 import com.mmserver.exception.NotFoundPasswordException;
 import com.mmserver.repository.RedisRepository;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -124,6 +127,16 @@ public class AuthService {
      * @return UserInfoDTO : 로그인 사용자 정보
      */
     public UserInfoDTO signup(SignupDTO signInfo, HttpServletResponse response) {
+        // 사용자 이메일 중복 확인
+        if(isCheckedEmail(signInfo.getEmail())) {
+            throw new DuplicationEmailExceiption();
+        }
+
+        // 사용자 이름 중복 확인
+        if(isCheckedUserName(signInfo.getUserName())) {
+            throw new DuplicationUserNameExceiption();
+        }
+
         // 저장 객체 생성
         User user = User.builder()
                 .email(signInfo.getEmail())
@@ -143,6 +156,28 @@ public class AuthService {
         registerAuthorizatione(user, response);
 
         return user.toUserInfo();
+    }
+
+    /**
+     * 사용자 이메일 중복확인
+     *
+     * @param  email   : 사용자 이메일
+     * @return boolean : 중복 여부(true => 중복)
+     */
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public boolean isCheckedEmail(String email) {
+        return userRepository.findById(email).isPresent();
+    }
+
+    /**
+     * 사용자 이름 중복확인
+     *
+     * @param  userName : 사용자 이름
+     * @return boolean  : 중복 여부(true => 중복)
+     */
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public boolean isCheckedUserName(String userName) {
+        return userRepository.findByUserName(userName).isPresent();
     }
 
     /**
