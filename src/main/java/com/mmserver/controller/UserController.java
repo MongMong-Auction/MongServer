@@ -1,9 +1,12 @@
 package com.mmserver.controller;
 
-import com.mmserver.domain.mapper.UserInfoMapping;
+import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 사용자 관리 Controller
@@ -21,11 +24,11 @@ public class UserController {
     /**
      * 사용자 정보 조회
      *
-     * @param  email           : 사용자 이메일
-     * @return UserInfoMapping : 사용자 정보 Mapper
+     * @param  id          : 식별 값
+     * @return UserInfoDTO : 사용자 정보
      */
-    @GetMapping("/{email}")
-    public UserInfoMapping findUserByEmail(@PathVariable String email) {
-        return userService.findUserByEmail(email);
+    @GetMapping("/{id}")
+    public UserInfoDTO findUserByEmail(@PathVariable Long id) {
+        return userService.findUserByEmail(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.mmserver.config.security.oauth;
 
+import com.mmserver.exception.NotSupportedOAuthException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,7 +63,7 @@ public class OAuth2UserInfo {
             case "kakao":
                 return ofKakao(oauth, attributes);
             default:
-                throw new RuntimeException();
+                throw new NotSupportedOAuthException();
         }
     }
 

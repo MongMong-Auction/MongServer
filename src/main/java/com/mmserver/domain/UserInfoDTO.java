@@ -7,14 +7,18 @@ import java.io.Serializable;
 /**
  * 사용자 정보
  */
-@Setter
 @Getter
 @NoArgsConstructor
 @ToString
 public class UserInfoDTO implements Serializable {
 
     /**
-     * 사용자 아이디(Primary Key)
+     * 식별 값(PK)
+     */
+    private Long id;
+
+    /**
+     * 사용자 아이디
      */
     private String email;
 
@@ -26,7 +30,7 @@ public class UserInfoDTO implements Serializable {
     /**
      * 포인트
      */
-    private long point;
+    private int point;
 
     /**
      * 테마 설정 값
@@ -34,7 +38,8 @@ public class UserInfoDTO implements Serializable {
     private int theme;
 
     @Builder
-    public UserInfoDTO(String email, String userName, long point, int theme) {
+    public UserInfoDTO(Long id, String email, String userName, int point, int theme) {
+        this.id       = id;
         this.email    = email;
         this.userName = userName;
         this.point    = point;

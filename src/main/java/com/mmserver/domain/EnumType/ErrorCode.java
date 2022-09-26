@@ -6,6 +6,11 @@ package com.mmserver.domain.EnumType;
 public enum ErrorCode {
     // JWT
     /**
+     * Access Token 없음
+     */
+    JWT_ACCESS_TOKEN_EMPTY(401, "Access Token이 존재하지 않습니다."),
+
+    /**
      * Access Token 만료
      */
     JWT_ACCESS_TOKEN_EXPIRED(701, "만료된 Access Token 입니다."),

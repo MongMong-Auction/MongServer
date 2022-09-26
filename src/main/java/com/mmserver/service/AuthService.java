@@ -7,8 +7,8 @@ import com.mmserver.domain.SignupDTO;
 import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
-import com.mmserver.exception.DuplicationEmailExceiption;
-import com.mmserver.exception.DuplicationUserNameExceiption;
+import com.mmserver.exception.DuplicationEmailException;
+import com.mmserver.exception.DuplicationUserNameException;
 import com.mmserver.exception.NotFoundEmailException;
 import com.mmserver.exception.NotFoundPasswordException;
 import com.mmserver.repository.RedisRepository;
@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static com.mmserver.domain.EnumType.ErrorCode.JWT_ACCESS_TOKEN_EMPTY;
 import static com.mmserver.domain.EnumType.ErrorCode.JWT_REFRESH_TOKEN_EXPIRED;
 
 /**
@@ -66,40 +67,50 @@ public class AuthService {
      * @throws IOException : I/O 시, 오류가 발생한 경우
      */
     public boolean reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            // 토큰 조회
-            String token = jwtProvider.resolveToken(request);
-            log.info("  token        => {}", token);
+        // 토큰 조회
+        String token = jwtProvider.resolveToken(request);
+        log.info("token : {}", token);
 
+        if(token == null) {
+            log.error("토큰 값이 없습니다.");
+            log.error("Status : {}", JWT_ACCESS_TOKEN_EMPTY.getStatus());
+            log.error("Error Message : {}", JWT_ACCESS_TOKEN_EMPTY.getMsg());
+
+            response.sendError(JWT_ACCESS_TOKEN_EMPTY.getStatus(), JWT_ACCESS_TOKEN_EMPTY.getMsg());
+
+            return false;
+        }
+
+        try {
             // 만료된 토큰을 통해 eamil 조회
             HashMap<String, String> payloadMap = JwtUtils.getPayloadByToken(token);
-            log.info("  Access Token payloadMap    => {}", payloadMap);
+            log.info("Access Token payloadMap : {}", payloadMap);
 
             // PayLoad 데이터 유무 확인
             if (payloadMap != null) {
                 String subData = payloadMap.get("sub");
-                log.info("  Access Token Payload Email => {}", subData);
+                log.info("Access Token Payload Email : {}", subData);
 
                 // 이메일을 통해 Redis에서 Refesh Token 조회
                 Token refreshToken = redisRepository.findById(subData)
                         .orElseThrow(() -> {
-                            log.error("  Redis에 저장된 정보 없음");
+                            log.error("Redis에 저장된 정보 없음");
                             // 이메일에 해당하는 Key가 없는경우 예외 발생
                             throw new NotFoundEmailException();
                         });
-                log.info("  refreshToken               => {}", refreshToken);
+                log.info("refreshToken : {}", refreshToken);
 
                 if (StringUtils.hasText(subData) && jwtProvider.validateToken(refreshToken.getToken())) {
                     String email = jwtProvider.getUserEmail(refreshToken.getToken());
 
                     // 로그인 아이디 통해 사용자 조회
-                    User user = userRepository.findById(email)
+                    User user = userRepository.findByEmail(email)
                             .orElseThrow(() -> {
-                                log.error("  Refesh Token 정보로 조회되는 사용자 없음");
+                                log.error("Refesh Token 정보로 조회되는 사용자 없음");
                                 // 조회된 사용자 없는 경우 예외 발생
                                 throw new NotFoundEmailException();
                             });
-                    log.info("  Refresh Token Find User    => {}", user);
+                    log.info("Refresh Token Find User    : {}", user);
 
                     // 인증정보 세팅
                     registerAuthorizatione(user, response);
@@ -109,7 +120,7 @@ public class AuthService {
             }
         } catch (ExpiredJwtException e) {
             log.error("Refresh Token 만료");
-            log.error("  Status        : {}", JWT_REFRESH_TOKEN_EXPIRED.getStatus());
+            log.error("Status : {}", JWT_REFRESH_TOKEN_EXPIRED.getStatus());
             log.error("  Error Message : {}", JWT_REFRESH_TOKEN_EXPIRED.getMsg());
 
             response.sendError(JWT_REFRESH_TOKEN_EXPIRED.getStatus(), JWT_REFRESH_TOKEN_EXPIRED.getMsg());
@@ -129,12 +140,12 @@ public class AuthService {
     public UserInfoDTO signup(SignupDTO signInfo, HttpServletResponse response) {
         // 사용자 이메일 중복 확인
         if(isCheckedEmail(signInfo.getEmail())) {
-            throw new DuplicationEmailExceiption();
+            throw new DuplicationEmailException();
         }
 
         // 사용자 이름 중복 확인
         if(isCheckedUserName(signInfo.getUserName())) {
-            throw new DuplicationUserNameExceiption();
+            throw new DuplicationUserNameException();
         }
 
         // 저장 객체 생성
@@ -144,11 +155,10 @@ public class AuthService {
                 .password(passwordEncoder.encode(signInfo.getPassword()))
                 .build();
 
-        log.info("  Signup User Info => {}", user);
+        log.info("Signup User Info : {}", user);
 
         // 마지막 로그인 날짜 변경
         user.lastLoginUpdate();
-
         // 사용자 정보 저장
         user = userRepository.save(user);
 
@@ -166,7 +176,7 @@ public class AuthService {
      */
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public boolean isCheckedEmail(String email) {
-        return userRepository.findById(email).isPresent();
+        return userRepository.findByEmail(email).isPresent();
     }
 
     /**
@@ -189,13 +199,13 @@ public class AuthService {
      */
     public UserInfoDTO login(LoginDTO loginDTO, HttpServletResponse response) {
         // 로그인 아이디 통해 사용자 조회
-        User user = userRepository.findById(loginDTO.getEmail())
+        User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> {
                     // 조회된 사용자 없는 경우 예외 발생
                     throw new NotFoundEmailException();
                 });
 
-        log.info("  Login User Info => {}", user);
+        log.info("Login User Info : {}", user);
 
         // 비밀번호 확인
         if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())){

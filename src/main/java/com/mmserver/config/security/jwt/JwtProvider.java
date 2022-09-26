@@ -107,7 +107,7 @@ public class JwtProvider {
      * @return Token           : 토큰 정보
      */
     private Token createToken(UserInfo userInfo, long tokenExpireTime) {
-        log.info("  userInfo         => {}", userInfo);
+        log.info("userInfo : {}", userInfo);
 
         // PayLoad 정보 세팅
         Claims claims = Jwts.claims().setSubject(userInfo.getName());
@@ -128,8 +128,8 @@ public class JwtProvider {
         String pattern = "yyyy-M-dd hh:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-        log.info("  token            => {}", token);
-        log.info("  tokenExpiresTime => {}", simpleDateFormat.format(tokenExpiresIn));
+        log.info("token : {}", token);
+        log.info("tokenExpiresTime : {}", simpleDateFormat.format(tokenExpiresIn));
 
         return Token.builder()
                 .key(userInfo.getName())
@@ -147,7 +147,7 @@ public class JwtProvider {
         log.info("Get Authentication");
         // 사용자 이메일 조회
         String email = getUserEmail(token);
-        log.info("  email => {}", email);
+        log.info("email : {}", email);
 
         // Authentication에 저장하기 위한 객체
         UserInfo userInfo = (UserInfo) userService.loadUserByUsername(email);
@@ -182,13 +182,13 @@ public class JwtProvider {
         // Http Header에서 토큰정보 추출
         String token = request.getHeader(jwtHeader);
 
-        log.info("  token => {}", token);
+        log.info("token : {}", token);
 
         if(StringUtils.hasText(token) && token.startsWith(jwtPrefix)){
             return token.substring(7);
         }
 
-        log.info("  token 추출 실패");
+        log.info("token 추출 실패");
 
         return null;
     }
@@ -203,14 +203,14 @@ public class JwtProvider {
         log.info("JWT Validation");
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            log.info("  Success");
+            log.info("Success");
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.error("  잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다.");
         } catch (UnsupportedJwtException e) {
-            log.error("  지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            log.error("  JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.");
         }
 
         return false;
@@ -224,7 +224,7 @@ public class JwtProvider {
      */
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
         log.info("Set Access Token in Header");
-        log.info("  {} : {}", jwtHeader, jwtPrefix + " " + accessToken);
+        log.info("{} : {}", jwtHeader, jwtPrefix + " " + accessToken);
         response.setHeader(jwtHeader, jwtPrefix + " " + accessToken);
     }
 }

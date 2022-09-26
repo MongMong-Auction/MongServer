@@ -44,15 +44,15 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
         // 사용자 정보 추출
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        log.info("  User Attributes => {}", attributes);
+        log.info("User Attributes : {}", attributes);
 
         // OAuth 서비스 이름
         String oauth = userRequest.getClientRegistration().getRegistrationId();
-        log.info("  OAuth2          => {}", oauth);
+        log.info("OAuth2  : {}", oauth);
 
         // OAuth 서비스의 유저 정보
         OAuth2UserInfo userInfo = OAuth2UserInfo.of(oauth, attributes);
-        log.info("  userInfo        => {}", userInfo);
+        log.info("userInfo : {}", userInfo);
 
         // Kakao 로그인의 경우 email 값을 필수로 받을 수 없음
         // OAuth2 인증은 성공하였지만 email 정보 제공 미동의 경우
@@ -63,8 +63,8 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
                 throw new OAuth2AuthenticationException(new OAuth2Error("400"), "제공 항목 미동의 시, 계속 진행할 수 없습니다.");
             }else{
                 log.info("인증정보 삭제 실패");
-                log.info("OAuth 기관    => {}", oauth);
-                log.info("Access Token => {}", userRequest.getAccessToken().getTokenValue());
+                log.info("OAuth 기관 : {}", oauth);
+                log.info("Access Token : {}", userRequest.getAccessToken().getTokenValue());
                 throw new RuntimeException("인증정보 삭제 실패");
             }
         }
@@ -81,11 +81,11 @@ public class OAuth2Provider implements OAuth2UserService<OAuth2UserRequest, OAut
      */
     private boolean kakaoLogout(String accessToken) {
         log.info("Kakao Logout");
-        log.info("  Kakao Access Token => {}", accessToken);
+        log.info("Kakao Access Token : {}", accessToken);
 
         int result = 0;
 
-        String host = "https://kapi.kakao.com/v1/user/unlink";
+        final String host = "https://kapi.kakao.com/v1/user/unlink";
 
         try {
             URL url = new URL(host);

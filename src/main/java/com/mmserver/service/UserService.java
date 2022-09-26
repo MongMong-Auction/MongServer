@@ -1,7 +1,7 @@
 package com.mmserver.service;
 
 import com.mmserver.config.security.UserInfo;
-import com.mmserver.domain.mapper.UserInfoMapping;
+import com.mmserver.domain.UserInfoDTO;
 import com.mmserver.domain.model.User;
 import com.mmserver.exception.NotFoundEmailException;
 import com.mmserver.repository.UserRepository;
@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws NotFoundEmailException {
-        User user = userRepository.findById(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> {
                     throw new NotFoundEmailException();
                 });
@@ -43,12 +43,12 @@ public class UserService implements UserDetailsService {
     /**
      * 사용자 정보 조회
      *
-     * @param  email           : 사용자 이메일
-     * @return UserInfoMapping : 사용자 정보 Mapper
+     * @param  id          : 사용자 식별 값
+     * @return UserInfoDTO : 사용자 정보
      */
-    public UserInfoMapping findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> {
+    public UserInfoDTO findUserByEmail(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundEmailException();
-        });
+        }).toUserInfo();
     }
 }

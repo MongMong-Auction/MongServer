@@ -3,7 +3,7 @@ package com.mmserver.exception;
 /**
  * 사용자 이메일 중복된 경우 발생
  */
-public class DuplicationEmailExceiption extends RuntimeException {
+public class DuplicationEmailException extends RuntimeException {
 
     @Override
     public String getMessage() {

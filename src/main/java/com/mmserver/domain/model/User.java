@@ -19,12 +19,24 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name        = "EMAIL_UNIQUE",
+                columnNames = "email"
+        )
+})
 public class User {
 
     /**
-     * 사용자 아이디(Primary Key)
+     * 식별 값(PK)
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 사용자 아이디
+     */
     private String email;
 
     /**
@@ -51,7 +63,7 @@ public class User {
     /**
      * 포인트
      */
-    private long point;
+    private int point;
 
     /**
      * 테마 설정 값
@@ -92,7 +104,8 @@ public class User {
     public void prePersist() {
         // role 값이 없을 경우
         // default => USER
-        role   = role == null ? RoleType.USER : role;
+        role   = (role == null) ? RoleType.USER : role;
+
         // 계정 잠금 여부 N
         lockYn = "N";
     }
@@ -135,20 +148,21 @@ public class User {
         email    = user.getEmail();
         oauth    = user.getOauth();
         userName = user.getUserName();
+
+        lastLoginUpdate();
     }
 
     /**
      * 마지막 로그인 날짜 업데이트
+     *
+     * 최초 로그인의 경우     - 100point
+     * 오늘 처음 로그인의 경우 - 10point 추가
      */
     public void lastLoginUpdate(){
         if(lastLogin == null){
-            // 최초 로그인의 경우
-            // 100point로 초기화
             point = 100;
             lastLogin = LocalDate.now();
         }else if(!lastLogin.isEqual(LocalDate.now())){
-            // 해당 날짜에 처음 로그인의 경우
-            // 10point 추가
             point += 10;
             lastLogin = LocalDate.now();
         }
@@ -175,6 +189,7 @@ public class User {
      */
     public UserInfoDTO toUserInfo() {
         return UserInfoDTO.builder()
+                .id(this.id)
                 .email(this.getEmail())
                 .userName(this.getUserName())
                 .point(this.getPoint())

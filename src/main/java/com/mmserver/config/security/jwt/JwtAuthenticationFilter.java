@@ -45,12 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("JWT 인증 필터");
         try {
             String path = request.getServletPath();
-            log.info("  접근 Path     => {}", path);
+            log.info("접근 Path : {}", path);
 
             // Access Token 재발급하는 경우 토큰 체크 안함
-            if(!path.startsWith("/reissue") && !path.startsWith("/check")) {
+            if(!path.startsWith("/reissue")) {
                 String accessToken = jwtProvider.resolveToken(request);
-                log.info("  Access Token => {}", accessToken);
+                log.info("Access Token : {}", accessToken);
 
                 if (StringUtils.hasText(accessToken) && jwtProvider.validateToken(accessToken)) {
                     Authentication authentication = jwtProvider.getAuthentication(accessToken);
@@ -61,8 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             log.error("Access Token 만료");
-            log.error("  Status        : {}", JWT_ACCESS_TOKEN_EXPIRED.getStatus());
-            log.error("  Error Message : {}", JWT_ACCESS_TOKEN_EXPIRED.getMsg());
+            log.error("Status : {}", JWT_ACCESS_TOKEN_EXPIRED.getStatus());
+            log.error("Error Message : {}", JWT_ACCESS_TOKEN_EXPIRED.getMsg());
 
             response.setCharacterEncoding("UTF-8");
             response.setContentType("text/html; charset=UTF-8");
