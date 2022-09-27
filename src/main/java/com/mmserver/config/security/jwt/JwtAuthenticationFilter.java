@@ -30,13 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     /**
-     * 필터 체인에 등록될 로직
-     * (HttpServletRequest, HttpServletResponse 대신 제공)
+     * JWT 검증
+     *
      * @see org.apache.catalina.AsyncDispatcher
      *
      * @param request     : 요청 객체
      * @param response    : 응답 객체
-     * @param filterChain :
+     * @param filterChain : 다음 필터를 호출하기 위한 객체
      * @throws ServletException : 서블릿에서 오류 발생한 경우
      * @throws IOException      : I/O 시, 오류가 발생한 경우
      */
