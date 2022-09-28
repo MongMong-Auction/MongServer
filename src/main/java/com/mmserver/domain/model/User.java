@@ -190,10 +190,11 @@ public class User {
     public UserInfoDTO toUserInfo() {
         return UserInfoDTO.builder()
                 .id(this.id)
-                .email(this.getEmail())
-                .userName(this.getUserName())
-                .point(this.getPoint())
-                .theme(this.getTheme())
+                .email(this.email)
+                .userName(this.userName)
+                .role(this.role)
+                .point(this.point)
+                .theme(this.theme)
                 .build();
     }
 

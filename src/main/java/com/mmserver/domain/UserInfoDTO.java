@@ -1,5 +1,6 @@
 package com.mmserver.domain;
 
+import com.mmserver.domain.EnumType.RoleType;
 import lombok.*;
 
 import java.io.Serializable;
@@ -28,6 +29,11 @@ public class UserInfoDTO implements Serializable {
     private String userName;
 
     /**
+     * 사용자 권한
+     */
+    private RoleType role;
+
+    /**
      * 포인트
      */
     private int point;
@@ -38,10 +44,11 @@ public class UserInfoDTO implements Serializable {
     private int theme;
 
     @Builder
-    public UserInfoDTO(Long id, String email, String userName, int point, int theme) {
+    public UserInfoDTO(Long id, String email, String userName, RoleType role, int point, int theme) {
         this.id       = id;
         this.email    = email;
         this.userName = userName;
+        this.role     = role;
         this.point    = point;
         this.theme    = theme;
     }
