@@ -37,27 +37,32 @@ public class User {
     /**
      * 사용자 아이디
      */
+    @Column(length = 50, nullable = false, unique = true)
     private String email;
 
     /**
      * OAuth 서비스 이름
      */
+    @Column(length = 10)
     private String oauth;
 
     /**
      * 비밀번호
      */
+    @Column(length = 100)
     private String password;
 
     /**
      * 사용자 이름
      */
+    @Column(length = 50, nullable = false)
     private String userName;
 
     /**
      * 사용자 권한
      */
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private RoleType role;
 
     /**
@@ -78,6 +83,7 @@ public class User {
     /**
      * 계정 잠금 여부
      */
+    @Column(length = 1)
     private String lockYn;
 
     /**

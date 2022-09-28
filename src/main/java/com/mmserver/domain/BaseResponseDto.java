@@ -15,10 +15,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 public class BaseResponseDto<T> implements Serializable {
-    /**
-     * 성공유무
-     */
-    private boolean success;
 
     /**
      * 응답 메시지

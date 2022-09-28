@@ -1,5 +1,7 @@
 package com.mmserver.domain.EnumType;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * 에러 코드 Enum
  */
@@ -8,7 +10,7 @@ public enum ErrorCode {
     /**
      * Access Token 없음
      */
-    JWT_ACCESS_TOKEN_EMPTY(401, "Access Token이 존재하지 않습니다."),
+    JWT_ACCESS_TOKEN_EMPTY(HttpStatus.UNAUTHORIZED.value(), "Access Token이 존재하지 않습니다."),
 
     /**
      * Access Token 만료

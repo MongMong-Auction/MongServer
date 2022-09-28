@@ -1,0 +1,59 @@
+= MongMong-Auction API guide
+Andy Wilkinson;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
+
+== USER API
+
+=== 1. CREATE USER
+
+==== 회원가입
+
+`*_1. Success_*`
+
+**request-fields**
+include::{snippets}/users/signup/success/request-fields.adoc[]
+
+**Example request**
+include::{snippets}/users/signup/success/http-request.adoc[]
+
+**response-fields**
+include::{snippets}/users/signup/success/response-fields.adoc[]
+
+**Example response**
+include::{snippets}/users/signup/success/http-response.adoc[]
+
+---
+
+`*_2. Fail : Duplication Email_*`
+
+**request-fields**
+include::{snippets}/users/signup/fail/duplicateEmail/request-fields.adoc[]
+
+**Example request**
+include::{snippets}/users/signup/fail/duplicateEmail/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/signup/fail/duplicateEmail/http-response.adoc[]
+
+---
+
+`*_3. Fail : Duplication UserName_*`
+
+**request-fields**
+include::{snippets}/users/signup/fail/duplicateUserName/request-fields.adoc[]
+
+**Example request**
+include::{snippets}/users/signup/fail/duplicateUserName/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/signup/fail/duplicateUserName/http-response.adoc[]
+
+---
+

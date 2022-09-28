@@ -5,6 +5,8 @@ import com.mmserver.domain.SignupDto;
 import com.mmserver.domain.UserInfoDto;
 import com.mmserver.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,13 +41,13 @@ public class AuthController {
      * 회원가입
      * (회원가입 후 자동 로그인)
      *
-     * @param  signInfo    : 회원가입 정보
-     * @param  response    : 응답 객체
-     * @return UserInfoDTO : 로그인 사용자 정보
+     * @param  signInfo                    : 회원가입 정보
+     * @param  response                    : 응답 객체
+     * @return ResponseEntity<UserInfoDto> : 로그인 사용자 정보
      */
     @PostMapping("/signup")
-    public UserInfoDto signup(@RequestBody SignupDto signInfo, HttpServletResponse response) {
-        return authService.signup(signInfo, response);
+    public ResponseEntity<UserInfoDto> signup(@RequestBody SignupDto signInfo, HttpServletResponse response) {
+        return new ResponseEntity<>(authService.signup(signInfo, response), HttpStatus.CREATED);
     }
 
     /**

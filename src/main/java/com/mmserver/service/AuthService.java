@@ -9,8 +9,8 @@ import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
 import com.mmserver.exception.DuplicationEmailException;
 import com.mmserver.exception.DuplicationUserNameException;
+import com.mmserver.exception.MisMatchPasswordException;
 import com.mmserver.exception.NotFoundEmailException;
-import com.mmserver.exception.NotFoundPasswordException;
 import com.mmserver.repository.RedisRepository;
 import com.mmserver.repository.UserRepository;
 import com.mmserver.utils.JwtUtils;
@@ -135,7 +135,7 @@ public class AuthService {
      *
      * @param  signInfo    : 회원가입 정보
      * @param  response    : 응답 객체
-     * @return UserInfoDTO : 로그인 사용자 정보
+     * @return UserInfoDto : 로그인 사용자 정보
      */
     public UserInfoDto signup(SignupDto signInfo, HttpServletResponse response) {
         // 사용자 이메일 중복 확인
@@ -212,7 +212,7 @@ public class AuthService {
             // 비밀번호 실패 횟수 증가
             user.addFailCnt();
             // 비밀번호 미일치 예외
-            throw new NotFoundPasswordException();
+            throw new MisMatchPasswordException();
         }
 
         // 마지막 로그인 날짜 변경

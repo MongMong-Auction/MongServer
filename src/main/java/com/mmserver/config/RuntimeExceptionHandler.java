@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @Slf4j
 @RestControllerAdvice
-@ResponseStatus(HttpStatus.BAD_REQUEST)
 public class RuntimeExceptionHandler {
 
     /**
@@ -20,6 +19,7 @@ public class RuntimeExceptionHandler {
      * @param e {@link NotSupportedOAuthException} 객체
      * @return String : message
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NotSupportedOAuthException.class)
     public String notSupportedOAuthExceptionHandler(NotSupportedOAuthException e) {
         log.error("Status : {}", HttpStatus.BAD_REQUEST);
@@ -33,23 +33,25 @@ public class RuntimeExceptionHandler {
      * @param e {@link NotFoundEmailException} 객체
      * @return String : message
      */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundEmailException.class)
     public String notFoundEmailExceiptionHandler(NotFoundEmailException e) {
         log.error("NotFoundEmailException");
-        log.error("Status : {}", HttpStatus.BAD_REQUEST);
+        log.error("Status : {}", HttpStatus.NOT_FOUND);
         log.error("Error Message : {}", e.getMessage());
 
         return e.getMessage();
     }
 
     /**
-     * {@link NotFoundPasswordException} 예외 처리
-     * @param e {@link NotFoundPasswordException} 객체
+     * {@link MisMatchPasswordException} 예외 처리
+     * @param e {@link MisMatchPasswordException} 객체
      * @return String : message
      */
-    @ExceptionHandler(NotFoundPasswordException.class)
-    public String notFoundPasswordExceiptionHandler(NotFoundPasswordException e) {
-        log.error("Status : {}", HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(MisMatchPasswordException.class)
+    public String misMatchPasswordExceiptionHandler(MisMatchPasswordException e) {
+        log.error("Status : {}", HttpStatus.NOT_FOUND);
         log.error("Error Message : {}", e.getMessage());
 
         return e.getMessage();
@@ -60,9 +62,10 @@ public class RuntimeExceptionHandler {
      * @param e {@link DuplicationEmailException} 객체
      * @return String : message
      */
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicationEmailException.class)
     public String duplicationEmailExceiptionHandler(DuplicationEmailException e) {
-        log.error("Status : {}", HttpStatus.BAD_REQUEST);
+        log.error("Status : {}", HttpStatus.CONFLICT);
         log.error("Error Message : {}", e.getMessage());
 
         return e.getMessage();
@@ -73,9 +76,10 @@ public class RuntimeExceptionHandler {
      * @param e {@link DuplicationUserNameException} 객체
      * @return String : message
      */
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicationUserNameException.class)
     public String duplicationUserNameExceiptionHandler(DuplicationUserNameException e) {
-        log.error("Status : {}", HttpStatus.BAD_REQUEST);
+        log.error("Status : {}", HttpStatus.CONFLICT);
         log.error("Error Message : {}", e.getMessage());
 
         return e.getMessage();
