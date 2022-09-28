@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class BaseResponseDTO<T> implements Serializable {
+public class BaseResponseDto<T> implements Serializable {
     /**
      * 성공유무
      */

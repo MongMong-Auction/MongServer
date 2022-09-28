@@ -1,8 +1,8 @@
 package com.mmserver.controller;
 
-import com.mmserver.domain.LoginDTO;
-import com.mmserver.domain.SignupDTO;
-import com.mmserver.domain.UserInfoDTO;
+import com.mmserver.domain.LoginDto;
+import com.mmserver.domain.SignupDto;
+import com.mmserver.domain.UserInfoDto;
 import com.mmserver.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +44,7 @@ public class AuthController {
      * @return UserInfoDTO : 로그인 사용자 정보
      */
     @PostMapping("/signup")
-    public UserInfoDTO signup(@RequestBody SignupDTO signInfo, HttpServletResponse response) {
+    public UserInfoDto signup(@RequestBody SignupDto signInfo, HttpServletResponse response) {
         return authService.signup(signInfo, response);
     }
 
@@ -78,7 +78,7 @@ public class AuthController {
      * @return UserInfoDTO : 로그인 사용자 정보
      */
     @GetMapping("/login")
-    public UserInfoDTO login(@ModelAttribute LoginDTO loginDTO, HttpServletResponse response) {
+    public UserInfoDto login(@ModelAttribute LoginDto loginDTO, HttpServletResponse response) {
         return authService.login(loginDTO, response);
     }
 }

@@ -2,7 +2,7 @@ package com.mmserver.domain.model;
 
 import com.mmserver.config.security.oauth.OAuth2UserInfo;
 import com.mmserver.domain.EnumType.RoleType;
-import com.mmserver.domain.UserInfoDTO;
+import com.mmserver.domain.UserInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -187,8 +187,8 @@ public class User {
      *
      * @return UserInfoDTO : 세팅된 객체
      */
-    public UserInfoDTO toUserInfo() {
-        return UserInfoDTO.builder()
+    public UserInfoDto toUserInfo() {
+        return UserInfoDto.builder()
                 .id(this.id)
                 .email(this.email)
                 .userName(this.userName)

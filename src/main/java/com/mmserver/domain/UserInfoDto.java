@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @ToString
-public class UserInfoDTO implements Serializable {
+public class UserInfoDto implements Serializable {
 
     /**
      * 식별 값(PK)
@@ -44,7 +44,7 @@ public class UserInfoDTO implements Serializable {
     private int theme;
 
     @Builder
-    public UserInfoDTO(Long id, String email, String userName, RoleType role, int point, int theme) {
+    public UserInfoDto(Long id, String email, String userName, RoleType role, int point, int theme) {
         this.id       = id;
         this.email    = email;
         this.userName = userName;

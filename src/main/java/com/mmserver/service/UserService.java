@@ -1,7 +1,7 @@
 package com.mmserver.service;
 
 import com.mmserver.config.security.UserInfo;
-import com.mmserver.domain.UserInfoDTO;
+import com.mmserver.domain.UserInfoDto;
 import com.mmserver.domain.model.User;
 import com.mmserver.exception.NotFoundEmailException;
 import com.mmserver.repository.UserRepository;
@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
      * @param  id          : 사용자 식별 값
      * @return UserInfoDTO : 사용자 정보
      */
-    public UserInfoDTO findUserByEmail(Long id) {
+    public UserInfoDto findUserByEmail(Long id) {
         return userRepository.findById(id).orElseThrow(() -> {
             throw new NotFoundEmailException();
         }).toUserInfo();

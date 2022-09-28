@@ -2,9 +2,9 @@ package com.mmserver.service;
 
 import com.mmserver.config.security.UserInfo;
 import com.mmserver.config.security.jwt.JwtProvider;
-import com.mmserver.domain.LoginDTO;
-import com.mmserver.domain.SignupDTO;
-import com.mmserver.domain.UserInfoDTO;
+import com.mmserver.domain.LoginDto;
+import com.mmserver.domain.SignupDto;
+import com.mmserver.domain.UserInfoDto;
 import com.mmserver.domain.model.Token;
 import com.mmserver.domain.model.User;
 import com.mmserver.exception.DuplicationEmailException;
@@ -137,7 +137,7 @@ public class AuthService {
      * @param  response    : 응답 객체
      * @return UserInfoDTO : 로그인 사용자 정보
      */
-    public UserInfoDTO signup(SignupDTO signInfo, HttpServletResponse response) {
+    public UserInfoDto signup(SignupDto signInfo, HttpServletResponse response) {
         // 사용자 이메일 중복 확인
         if(isCheckedEmail(signInfo.getEmail())) {
             throw new DuplicationEmailException();
@@ -197,7 +197,7 @@ public class AuthService {
      * @param  response    : 응답 객체
      * @return UserInfoDTO : 로그인 사용자 정보
      */
-    public UserInfoDTO login(LoginDTO loginDTO, HttpServletResponse response) {
+    public UserInfoDto login(LoginDto loginDTO, HttpServletResponse response) {
         // 로그인 아이디 통해 사용자 조회
         User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> {

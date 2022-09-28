@@ -1,6 +1,6 @@
 package com.mmserver.controller;
 
-import com.mmserver.domain.UserInfoDTO;
+import com.mmserver.domain.UserInfoDto;
 import com.mmserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ public class UserController {
      * @return UserInfoDTO : 사용자 정보
      */
     @GetMapping("/{id}")
-    public UserInfoDTO findUserByEmail(@PathVariable Long id) {
+    public UserInfoDto findUserByEmail(@PathVariable Long id) {
         return userService.findUserByEmail(id);
     }
 }

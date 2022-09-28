@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 @ToString
-public class LoginDTO implements Serializable {
+public class LoginDto implements Serializable {
 
     /**
      * 사용자 아이디

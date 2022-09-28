@@ -1,5 +1,6 @@
 package com.mmserver.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @ToString
-public class SignupDTO implements Serializable {
+public class SignupDto implements Serializable {
 
     /**
      * 사용자 아이디
@@ -33,4 +34,11 @@ public class SignupDTO implements Serializable {
      */
     @NotBlank(message = "사용자 이름은 필수 입력사항입니다.")
     private String userName;
+
+    @Builder
+    public SignupDto(String email, String password, String userName) {
+        this.email    = email;
+        this.password = password;
+        this.userName = userName;
+    }
 }
