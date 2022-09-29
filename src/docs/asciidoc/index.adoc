@@ -55,5 +55,68 @@ include::{snippets}/users/signup/fail/duplicateUserName/http-request.adoc[]
 **Example response**
 include::{snippets}/users/signup/fail/duplicateUserName/http-response.adoc[]
 
+NOTE: 이메일/닉네임 중복검사 후 회원가입 버튼 클릭 시, 중복 검사를 한번 더 진행합니다. +
+이메일 또는 닉네임 중복 시, 에러메시지와 함께 회원가입에 실패합니다. +
+회원가입 성공 시, 자동으로 로그인상태가 됩니다.
+
 ---
 
+==== 이메일 중복 검사
+
+`*_1. Success_*`
+
+include::{snippets}/users/check-email/success/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/check-email/success/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/check-email/success/http-response.adoc[]
+
+
+---
+
+
+`*_2. Fail_*`
+
+include::{snippets}/users/check-email/fail/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/check-email/fail/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/check-email/fail/http-response.adoc[]
+
+NOTE: 중복 검사 통과시 false , 중복 검사 실패시 true가 리턴됩니다.
+
+---
+
+==== 닉네임 중복 검사
+
+`*_1. Success_*`
+
+include::{snippets}/users/check-userName/success/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/check-userName/success/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/check-userName/success/http-response.adoc[]
+
+
+---
+
+
+`*_2. Fail_*`
+
+include::{snippets}/users/check-userName/fail/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/check-userName/fail/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/check-userName/fail/http-response.adoc[]
+
+NOTE: 중복 검사 통과시 false , 중복 검사 실패시 true가 리턴됩니다.
+
+---

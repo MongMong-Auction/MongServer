@@ -2,65 +2,95 @@ package com.mmserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmserver.domain.SignupDto;
-import com.mmserver.domain.model.User;
+import com.mmserver.domain.UserInfoDto;
 import com.mmserver.exception.DuplicationEmailException;
 import com.mmserver.exception.DuplicationUserNameException;
-import com.mmserver.repository.UserRepository;
 import com.mmserver.service.AuthService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpServletResponse;
+
+import static com.mmserver.domain.EnumType.RoleType.USER;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@Transactional
+@ExtendWith(RestDocumentationExtension.class)
+@WebMvcTest(AuthController.class)
+@ActiveProfiles("test")
+@MockBean(JpaMetamodelMappingContext.class)
 public class AuthControllerTest {
 
-    @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
+    @MockBean
+    private AuthService authService;
 
     @Autowired
-    AuthService authService;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    UserRepository userRepository;
+    @BeforeEach
+    public void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation))
+                .apply(sharedHttpSession())
+                .build();
+    }
 
     @Test
     @DisplayName("회원가입 성공")
     public void givenSignupDto_whenSignup_thenSuccess() throws Exception {
-        SignupDto dto = SignupDto.builder()
+        final UserInfoDto userInfoDto = UserInfoDto.builder()
+                .id(1L)
+                .email("email@gmail.com")
+                .userName("userName")
+                .role(USER)
+                .point(100)
+                .theme(0)
+                .build();
+
+        final SignupDto dto = SignupDto.builder()
                 .email("email@gmail.com")
                 .password("password")
                 .userName("userName")
                 .build();
 
-        this.mockMvc.perform(
+        when(authService.signup(any(SignupDto.class), any(HttpServletResponse.class))).thenReturn(userInfoDto);
+
+        mockMvc.perform(
                 post("/signup")
+                        .characterEncoding("UTF-8")
                         .content(objectMapper.writeValueAsString(dto))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andDo(document("user/signup/success",
+                .andDo(document("users/signup/success",
                         requestFields(
                                 fieldWithPath("email").type(JsonFieldType.STRING)
                                         .description("사용자 이메일"),
@@ -88,31 +118,24 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("회원가입 실패 - 이메일 중복")
-    public void givenSignupDto_whenSignup_thenFailDuplecationEmail() throws Exception {
-        User user = User.builder()
-                .email("email@gmail.com")
-                .password("password")
-                .userName("userName")
-                .build();
-
-        userRepository.save(user);
-
+    public void givenSignupDto_whenSignup_thenFailDuplecationEmailException() throws Exception {
         SignupDto dto = SignupDto.builder()
                 .email("email@gmail.com")
                 .password("password")
-                .userName("userName")
+                .userName("userName1")
                 .build();
 
-        doThrow(new DuplicationEmailException()).when(authService).signup(dto, null);
+        when(authService.signup(any(SignupDto.class), any(HttpServletResponse.class))).thenThrow(new DuplicationEmailException());
 
-        this.mockMvc.perform(
+        mockMvc.perform(
                         post("/signup")
+                                .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(dto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
                 .andExpect(status().isConflict())
-                .andDo(document("users/duplicateEmail/failure",
+                .andDo(document("users/signup/fail/duplicateEmail",
                         requestFields(
                                 fieldWithPath("email").type(JsonFieldType.STRING)
                                         .description("사용자 이메일"),
@@ -125,32 +148,25 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 사용자 이름 중복")
-    public void givenSignupDto_whenSignup_thenFailDuplecationUserName() throws Exception {
-        User user = User.builder()
-                .email("email@gmail.com")
-                .password("password")
-                .userName("userName")
-                .build();
-
-        userRepository.save(user);
-
+    @DisplayName("회원가입 실패 - 닉네임 중복")
+    public void givenSignupDto_whenSignup_thenFailDuplecationUserNameException() throws Exception {
         SignupDto dto = SignupDto.builder()
-                .email("email@gmail.com")
+                .email("email1@gmail.com")
                 .password("password")
                 .userName("userName")
                 .build();
 
-        doThrow(new DuplicationUserNameException()).when(authService).signup(any(), any());
+        when(authService.signup(any(SignupDto.class), any(HttpServletResponse.class))).thenThrow(new DuplicationUserNameException());
 
-        this.mockMvc.perform(
+        mockMvc.perform(
                         post("/signup")
+                                .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(dto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
                 .andExpect(status().isConflict())
-                .andDo(document("users/duplicateEmail/failure",
+                .andDo(document("users/signup/fail/duplicateUserName",
                         requestFields(
                                 fieldWithPath("email").type(JsonFieldType.STRING)
                                         .description("사용자 이메일"),
@@ -158,6 +174,94 @@ public class AuthControllerTest {
                                         .description("사용자 비밀번호"),
                                 fieldWithPath("userName").type(JsonFieldType.STRING)
                                         .description("사용자 이름")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("이메일 중복 검사 - 사용가능")
+    public void given_whenCheckedEmail_thenSuccess() throws Exception {
+        final String email = "email@gmail.com";
+
+        when(authService.isCheckedEmail(email)).thenReturn(false);
+
+        mockMvc.perform(
+                        get("/check/email")
+                                .param("email", email)
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"))
+                .andDo(document("users/check-email/success",
+                        requestParameters(
+                                parameterWithName("email").description("사용자 이메일")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("이메일 중복 검사 - 중복")
+    public void given_whenCheckedEmail_thenFail() throws Exception {
+        final String email = "email@gmail.com";
+
+        when(authService.isCheckedEmail(email)).thenReturn(true);
+
+        mockMvc.perform(
+                        get("/check/email")
+                                .param("email", email)
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"))
+                .andDo(document("users/check-email/fail",
+                        requestParameters(
+                                parameterWithName("email").description("사용자 이메일")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 검사 - 사용가능")
+    public void given_whenCheckedUserName_thenSuccess() throws Exception {
+        final String userName = "userName";
+
+        when(authService.isCheckedUserName(userName)).thenReturn(false);
+
+        mockMvc.perform(
+                        get("/check/userName")
+                                .param("userName", userName)
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"))
+                .andDo(document("users/check-userName/success",
+                        requestParameters(
+                                parameterWithName("userName").description("사용자 이름")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 검사 - 중복")
+    public void given_whenCheckedUserName_thenFail() throws Exception {
+        final String userName = "userName";
+
+        when(authService.isCheckedUserName(userName)).thenReturn(true);
+
+        mockMvc.perform(
+                        get("/check/userName")
+                                .param("userName", userName)
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"))
+                .andDo(document("users/check-userName/fail",
+                        requestParameters(
+                                parameterWithName("userName").description("사용자 이름")
                         )
                 ));
     }

@@ -7,6 +7,6 @@ public class DuplicationUserNameException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return "이미 가입된 이름입니다.";
+        return "이미 가입된 닉네임입니다.";
     }
 }
