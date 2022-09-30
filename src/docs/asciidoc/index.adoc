@@ -65,13 +65,13 @@ NOTE: 이메일/닉네임 중복검사 후 회원가입 버튼 클릭 시, 중�
 
 `*_1. Success_*`
 
-include::{snippets}/users/check-email/success/request-parameters.adoc[]
+include::{snippets}/users/checkEmail/success/request-parameters.adoc[]
 
 **Example request**
-include::{snippets}/users/check-email/success/http-request.adoc[]
+include::{snippets}/users/checkEmail/success/http-request.adoc[]
 
 **Example response**
-include::{snippets}/users/check-email/success/http-response.adoc[]
+include::{snippets}/users/checkEmail/success/http-response.adoc[]
 
 
 ---
@@ -79,13 +79,13 @@ include::{snippets}/users/check-email/success/http-response.adoc[]
 
 `*_2. Fail_*`
 
-include::{snippets}/users/check-email/fail/request-parameters.adoc[]
+include::{snippets}/users/checkEmail/fail/request-parameters.adoc[]
 
 **Example request**
-include::{snippets}/users/check-email/fail/http-request.adoc[]
+include::{snippets}/users/checkEmail/fail/http-request.adoc[]
 
 **Example response**
-include::{snippets}/users/check-email/fail/http-response.adoc[]
+include::{snippets}/users/checkEmail/fail/http-response.adoc[]
 
 NOTE: 중복 검사 통과시 false , 중복 검사 실패시 true가 리턴됩니다.
 
@@ -95,13 +95,13 @@ NOTE: 중복 검사 통과시 false , 중복 검사 실패시 true가 리턴됩�
 
 `*_1. Success_*`
 
-include::{snippets}/users/check-userName/success/request-parameters.adoc[]
+include::{snippets}/users/checkUserName/success/request-parameters.adoc[]
 
 **Example request**
-include::{snippets}/users/check-userName/success/http-request.adoc[]
+include::{snippets}/users/checkUserName/success/http-request.adoc[]
 
 **Example response**
-include::{snippets}/users/check-userName/success/http-response.adoc[]
+include::{snippets}/users/checkUserName/success/http-response.adoc[]
 
 
 ---
@@ -109,14 +109,61 @@ include::{snippets}/users/check-userName/success/http-response.adoc[]
 
 `*_2. Fail_*`
 
-include::{snippets}/users/check-userName/fail/request-parameters.adoc[]
+include::{snippets}/users/checkUserName/fail/request-parameters.adoc[]
 
 **Example request**
-include::{snippets}/users/check-userName/fail/http-request.adoc[]
+include::{snippets}/users/checkUserName/fail/http-request.adoc[]
 
 **Example response**
-include::{snippets}/users/check-userName/fail/http-response.adoc[]
+include::{snippets}/users/checkUserName/fail/http-response.adoc[]
 
 NOTE: 중복 검사 통과시 false , 중복 검사 실패시 true가 리턴됩니다.
+
+---
+
+
+=== 2. Login/Logout
+
+==== 로그인
+
+`*_1. Success_*`
+
+**request-fields**
+include::{snippets}/users/login/success/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/login/success/http-request.adoc[]
+
+**response-fields**
+include::{snippets}/users/login/success/response-fields.adoc[]
+
+**Example response**
+include::{snippets}/users/login/success/http-response.adoc[]
+
+---
+
+`*_2. Fail : Not Found Email_*`
+
+**request-fields**
+include::{snippets}/users/login/fail/notFoundEmail/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/login/fail/notFoundEmail/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/login/fail/notFoundEmail/http-response.adoc[]
+
+---
+
+`*_3. Fail : MisMatch Password_*`
+
+**request-fields**
+include::{snippets}/users/login/fail/misMatchPassword/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/login/fail/misMatchPassword/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/login/fail/misMatchPassword/http-response.adoc[]
 
 ---

@@ -1,10 +1,13 @@
 package com.mmserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmserver.domain.LoginDto;
 import com.mmserver.domain.SignupDto;
 import com.mmserver.domain.UserInfoDto;
 import com.mmserver.exception.DuplicationEmailException;
 import com.mmserver.exception.DuplicationUserNameException;
+import com.mmserver.exception.MisMatchPasswordException;
+import com.mmserver.exception.NotFoundEmailException;
 import com.mmserver.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -193,7 +196,7 @@ public class AuthControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"))
-                .andDo(document("users/check-email/success",
+                .andDo(document("users/checkEmail/success",
                         requestParameters(
                                 parameterWithName("email").description("사용자 이메일")
                         )
@@ -215,7 +218,7 @@ public class AuthControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"))
-                .andDo(document("users/check-email/fail",
+                .andDo(document("users/checkEmail/fail",
                         requestParameters(
                                 parameterWithName("email").description("사용자 이메일")
                         )
@@ -237,7 +240,7 @@ public class AuthControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"))
-                .andDo(document("users/check-userName/success",
+                .andDo(document("users/checkUserName/success",
                         requestParameters(
                                 parameterWithName("userName").description("사용자 이름")
                         )
@@ -259,9 +262,95 @@ public class AuthControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"))
-                .andDo(document("users/check-userName/fail",
+                .andDo(document("users/checkUserName/fail",
                         requestParameters(
                                 parameterWithName("userName").description("사용자 이름")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("로그인 성공")
+    public void givenLoginDto_whenLogin_thenSuccess() throws Exception {
+        final UserInfoDto userInfoDto = UserInfoDto.builder()
+                .id(1L)
+                .email("email@gmail.com")
+                .userName("userName")
+                .role(USER)
+                .point(100)
+                .theme(0)
+                .build();
+
+        when(authService.login(any(LoginDto.class), any(HttpServletResponse.class))).thenReturn(userInfoDto);
+
+        mockMvc.perform(
+                        get("/login")
+                                .param("email", "email@gamil.com")
+                                .param("password", "password")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("users/login/success",
+                        requestParameters(
+                                parameterWithName("email").description("사용자 이메일"),
+                                parameterWithName("password").description("사용자 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER)
+                                        .description("식별 값"),
+                                fieldWithPath("email").type(JsonFieldType.STRING)
+                                        .description("사용자 이메일"),
+                                fieldWithPath("userName").type(JsonFieldType.STRING)
+                                        .description("사용자 이름"),
+                                fieldWithPath("role").type(JsonFieldType.STRING)
+                                        .description("사용자 역할"),
+                                fieldWithPath("point").type(JsonFieldType.NUMBER)
+                                        .description("사용가능 포인트"),
+                                fieldWithPath("theme").type(JsonFieldType.NUMBER)
+                                        .description("설정 태마 값")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 잘못된 아이디")
+    public void givenLoginDto_whenLogin_thenFailNotFoundEmail() throws Exception {
+        when(authService.login(any(LoginDto.class), any(HttpServletResponse.class))).thenThrow(new NotFoundEmailException());
+
+        mockMvc.perform(
+                        get("/login")
+                                .param("email", "email@gamil.com")
+                                .param("password", "password")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andDo(document("users/login/fail/notFoundEmail",
+                        requestParameters(
+                                parameterWithName("email").description("사용자 이메일"),
+                                parameterWithName("password").description("사용자 비밀번호")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 잘못된 패스워드")
+    public void givenLoginDto_whenLogin_thenFailMisMatchPassword() throws Exception {
+        when(authService.login(any(LoginDto.class), any(HttpServletResponse.class))).thenThrow(new MisMatchPasswordException());
+
+        mockMvc.perform(
+                        get("/login")
+                                .param("email", "email@gamil.com")
+                                .param("password", "password")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andDo(document("users/login/fail/misMatchPassword",
+                        requestParameters(
+                                parameterWithName("email").description("사용자 이메일"),
+                                parameterWithName("password").description("사용자 비밀번호")
                         )
                 ));
     }
