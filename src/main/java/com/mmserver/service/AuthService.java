@@ -248,4 +248,14 @@ public class AuthService {
         // Refresh Token Redis에 저장
         redisRepository.save(refreshToken);
     }
+
+    /**
+     * 로그아웃
+     * Redis Refresh Token 삭제
+     *
+     * @param email : 사용자 이메일
+     */
+    public void logout(String email) {
+        redisRepository.deleteById(email);
+    }
 }

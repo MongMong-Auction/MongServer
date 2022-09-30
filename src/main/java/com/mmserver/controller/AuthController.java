@@ -83,4 +83,14 @@ public class AuthController {
     public UserInfoDto login(@ModelAttribute LoginDto loginDTO, HttpServletResponse response) {
         return authService.login(loginDTO, response);
     }
+
+    /**
+     * 로그아웃
+     *
+     * @param email : 사용자 이메일
+     */
+    @DeleteMapping("/logout")
+    public void logout(@RequestParam String email) {
+        authService.logout(email);
+    }
 }
