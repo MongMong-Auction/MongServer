@@ -26,8 +26,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
 /**
  * Security 환경 세팅
  */
@@ -132,7 +130,8 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         // Cors 허용 설정
-        corsConfiguration.setAllowedOrigins(Arrays.asList("localhost:3000", "https://black-grass-0bd498c00.1.azurestaticapps.net"));
+//        corsConfiguration.setAllowedOrigins(Arrays.asList("localhost:3000", "https://black-grass-0bd498c00.1.azurestaticapps.net"));
+        corsConfiguration.addAllowedOrigin("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);
