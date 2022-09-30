@@ -167,3 +167,16 @@ include::{snippets}/users/login/fail/misMatchPassword/http-request.adoc[]
 include::{snippets}/users/login/fail/misMatchPassword/http-response.adoc[]
 
 ---
+
+==== 로그아웃
+
+`*_1. Success_*`
+
+**request-fields**
+include::{snippets}/users/logout/success/request-parameters.adoc[]
+
+**Example request**
+include::{snippets}/users/logout/success/http-request.adoc[]
+
+**Example response**
+include::{snippets}/users/logout/success/http-response.adoc[]

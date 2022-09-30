@@ -33,8 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
@@ -351,6 +350,25 @@ public class AuthControllerTest {
                         requestParameters(
                                 parameterWithName("email").description("사용자 이메일"),
                                 parameterWithName("password").description("사용자 비밀번호")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("로그아웃")
+    public void given_whenLogout_thenSuccess() throws Exception {
+        when(authService.login(any(LoginDto.class), any(HttpServletResponse.class))).thenThrow(new MisMatchPasswordException());
+
+        mockMvc.perform(
+                        delete("/logout")
+                                .param("email", "email@gamil.com")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("users/logout/success",
+                        requestParameters(
+                                parameterWithName("email").description("사용자 이메일")
                         )
                 ));
     }
