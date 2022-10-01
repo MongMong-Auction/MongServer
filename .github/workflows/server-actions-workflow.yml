@@ -11,10 +11,8 @@ on:
   # src 이하 파일에서만 Event Trigger 발생
   push:
     branches: [ "main" ]
-    paths: "src/**"
   pull_request:
     branches: [ "main" ]
-    paths: "src/**"
 
 # 리전, 버킷 이름, CodeDeploy 앱 이름, CodeDeploy 배포 그룹 이름
 env:

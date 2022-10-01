@@ -73,6 +73,17 @@ task copyDocument(type: Copy) {
     into file("src/main/resources/static")
 }
 
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static'
+    }
+}
+
+jar {
+    enabled = false
+}
+
 build {
     dependsOn copyDocument
     enabled = false
