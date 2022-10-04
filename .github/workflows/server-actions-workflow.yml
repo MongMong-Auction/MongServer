@@ -8,9 +8,11 @@
 name: Java CI with Gradle
 
 on:
-  # src 이하 파일에서만 Event Trigger 발생
+  # push: src 이하 파일에서만 Event Trigger 발생
   push:
     branches: [ "main" ]
+    paths: "src/**"
+  # pull_request: 모든 파일에 대해서 Event Trigger 발생
   pull_request:
     branches: [ "main" ]
 
@@ -41,7 +43,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '11'
-        distribution: 'temurin'
+        distribution: 'zulu'
       
     # application-secrt.yml 생성
     - name: Set yml file
@@ -54,14 +56,16 @@ jobs:
     # Gradlew 권한 설정
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
+
     # Gradle 설정
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
+        # (있는 경우)현재 릴리스 버전 사용, 그렇지 않으면 안정적인 릴리스 버전으로 대체
+        gradle-version: release-candidate
         # Gradle clean and Build
         arguments: clean build
-        
+
     # AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -78,7 +82,7 @@ jobs:
           --ignore-hidden-files \
           --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
           --source .
-          
+
     # S3 버킷에 있는 파일 대상으로 CodeDeploy 실행
     - name: Deploy to AWS EC2 from S3
       run: |
